@@ -1,0 +1,96 @@
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #102c30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes loading-block2 {
+  0% {
+    opacity: 0;
+    transform: scaleY(0px);
+    transform: scaleX(0px)
+  }
+  30%,
+  60% {
+    opacity: 1;
+    transform: scaleY(100%);
+    transform: scaleX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(0px);
+    transform: scaleX(0px);
+  }
+}
+
+@keyframes loading-block {
+  0% {
+    opacity: 0;
+    transform: translateY(0px);
+    transform: scaleY(0px);
+    transform: scaleX(0px)
+  }
+  30%,
+  60% {
+    opacity: 1;
+    transform: translateY(20px);
+    transform: scaleY(100%);
+    transform: scaleX(100%);
+  }
+  to {
+    transform: translateY(40px);
+    opacity: 1;
+    transform: scaleY(0px);
+    transform: scaleX(0px);
+  }
+}
+
+.loading-screen.block.block {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 10;
+}
+.main.block.block {
+  height: 40px;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 40px);
+  grid-gap: 0px;
+}
+.main.block div.block {
+  background: rgb(255, 255, 255);
+}
+.main.block div.block:nth-child(1) {
+  margin-left: 40px;
+  margin-right: -40px;
+  animation: loading-block 1.5s 0.15s ease infinite backwards;
+}
+.main.block div.block:nth-child(2) {
+  margin-bottom: -40px;
+  margin-top: 40px;
+  margin-left: 0px;
+  margin-right: 0px;
+  animation: loading-block2 1.5s 0.80s ease infinite backwards;
+}
+.main.block div.block:nth-child(3) {
+  animation: loading-block 1.5s 0.40s ease infinite backwards;
+}
+.main.block div.block:nth-child(4) {
+  margin-bottom: -40px;
+  margin-top: 40px;
+  margin-left: -40px;
+  margin-right: 40px;
+  animation: loading-block 1.5s 0.60s ease infinite backwards;
+}

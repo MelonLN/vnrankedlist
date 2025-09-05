@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VNMCSR Ranked Data</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+</head>
+<body>
+    <header>
+        <img class="big" src="img/ranktracker.png">
+        <div class="gap"></div>
+        <div class="logo">
+          <p class="lg">VNMCSR</p>
+          <p class="lg">Ranked Data</p>
+        </div>
+    </header>
+    <div id="bg">
+        <p id="lead">Leaderboards</p>
+        <div id="showshower">
+            <ul id="nav2">
+                <li><a href="https://discord.gg/XKyCpdaR6C"><img src="./img/Discord.png" alt="Discord"></a></li>
+                <li><a href="https://github.com/babeoban/vnrankedlist"><img src="./img/Github.png" alt="Github"></a></li>
+                <li><a href="https://mcsrrankedtracker.vercel.app/leaderboards"><img src="./img/ranktracker.png" alt="Github"></a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="mode">
+        <a id="tt">Project archived! If you want to add a name please contact babeobanbim@gmail.com</a>
+        <button id="downloadButton">Download Table</button>
+        <button id="nub" onclick="window.location.href='https://babeoban.github.io'">Trang cá nhân</button>
+    </div>
+    <div class="time">
+        <span id="time"></span>
+    </div>
+    <div id="myModal" class="modal">
+        <div id="myModal-content" class="modal-content">
+            <span class="close">×</span>
+            <form action="https://formspree.io/f/xjvndgvd" method="POST" onsubmit="return false;">
+                <label for="InGameName">
+                  In Game Name:<br>
+                  <input type="text" id="InGameName" name="In-Game-Name" placeholder="Type name..." required>
+                  <button type="button" id="search"><img src="https://mcsrrankedtracker.vercel.app/_next/image?url=%2Fimages%2Ficons%2Fsearch.png&w=16&q=75" alt="search" id="img3"></button>
+                </label><br>
+                <div class="gap"></div>
+                <div id="info"></div>
+                <div id="lbt">
+                  <button id="btsm">Subscribe</button>
+                </div>
+            </form>
+        </div>
+    </div>    
+    <table id="rankedTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Elo</th>
+                <th>Best time</th>
+                <th>Winrate</th>
+                <th>FF rate</th>
+            </tr>
+        </thead>
+        <tbody id="rankedBody"></tbody>
+    </table>
+    <div id="loading-contai">
+        <canvas id="loadingCanvas" class="image-pixelated" width="21" height="21"></canvas>
+    </div>
+    <footer>
+        <span id="foot">
+            Project archived!<br>
+            By CanhVjp & MelonLN
+        </span>
+    </footer>
+    <script src="vnranked.js" defer></script>
+    <script src="./loading.js" defer></script>
+</body>
+</html>
