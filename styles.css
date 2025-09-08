@@ -202,8 +202,6 @@ body {
 }
 
 .big {
-  width: 200px;
-  height: 200px;
   display: block;
   margin: 0 auto;
 }
@@ -229,8 +227,8 @@ h1 {
 
 .big {
   position: absolute;
-  width: 70px;
-  height: 70px;
+  width: 120px;
+  height: 120px;
   margin-left: -200px;
   image-rendering: pixelated;
   /* filter: drop-shadow(0px 3px 2px rgba(0, 0, 0, 0.322)); */
@@ -407,7 +405,7 @@ h1 {
   animation: animation 0.4s;
 }
 
-#nub{
+#Sub{
   cursor: pointer;
   align-items: center;
   justify-content: center;
@@ -445,7 +443,7 @@ h1 {
   font-family:"mcfont", monospace;
 }
 
-#nub:hover,
+#Sub:hover,
 #btsm:hover,
 #search:hover,
 #downloadButton:hover {
@@ -482,10 +480,24 @@ footer{
   right: 0;
 }
 
-#nav2 li a img {
+#lol2, #lol3 {
   width: 30px;
   height: 30px;
-  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.322));
+  image-rendering: pixelated;
+}
+
+#lol{
+  display: flex;
+  margin-top: 2px;
+  width: 35px;  
+  height: 40px;    
+  object-fit: cover;
+}
+
+#lol4{
+  display: flex;
+  width: 40px;
+  height: 40px;
   image-rendering: pixelated;
 }
 
@@ -499,11 +511,12 @@ footer{
 
 #nav2 li{
   margin: 3px;
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.322));
 }
 
 #nav2 li:hover{
   transform: translateX(-2px) translateY(-2px);
-  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.322));
+  filter: drop-shadow(6px 6px 0px rgba(0, 0, 0, 0.322));
 }
 
 #nav2 li:active{
@@ -512,7 +525,7 @@ footer{
 }
 
 #tt{
-  font-size: 1em;
+  font-size: 2em;
   display: block;
   text-align: center;
   color: #fff;
