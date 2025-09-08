@@ -305,7 +305,7 @@ subscribeButton.addEventListener('click', async function () {
         const gistUUIDs = await response.json();
 
         if (gistUUIDs.includes(window.currentUUID)) {
-            document.getElementById('message').innerText = "This UUID already exists in gist.";
+            document.getElementById('message').innerText = "This UUID already exists.";
             document.getElementById('message').style.display = 'block';
             return;
         }
