@@ -199,29 +199,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-function updateLoadingProgress(loaded, total) {
-    const progress = loaded / total;
-    console.log(`Progress: ${loaded}/${total} = ${Math.round(progress * 100)}%`);
-
-    if (outerRing && innerRing) {
-        outerRing.radius = Math.floor(progress * outerRing.maxRadius);
-        innerRing.radius = Math.floor(progress * innerRing.maxRadius);
-    }
-
-    render();
-
-    if (loaded === total) {
-        const loadingScreen = document.getElementById('loading-contai');
-        const table = document.getElementById('rankedTable');
-
-        if (table && loadingScreen) {
-            table.style.display = 'table';
-            loadingScreen.style.display = 'none';
-        }
-    }
-}
-
-
     function outerLoader(pos) {
         if (!chunks) return false;
 
@@ -264,7 +241,9 @@ function updateLoadingProgress(loaded, total) {
 async function fetchUUIDs() {
     let uuidsFromGist = [];
     let uuidsFromFirestore = [];
+    let uuidsRankedVN = [];
 
+    // GIST
     try {
         const response = await fetch(
           'https://gist.githubusercontent.com/babeoban/b7b4db7f956878666740924864fdbb02/raw/663c46d38519d3607e2a9a718de8cd49e1bafd44/uuids.json'
@@ -274,6 +253,7 @@ async function fetchUUIDs() {
         console.error('Error fetching UUIDs from gist:', error);
     }
 
+    // FIRESTORE
     try {
         const snapshot = await window.getDocs(window.collection(window.db, "uuids"));
         uuidsFromFirestore = snapshot.docs.map(doc => doc.data().uuid);
@@ -281,9 +261,7 @@ async function fetchUUIDs() {
         console.error('Error fetching UUIDs from Firestore:', error);
     }
 
-    const combined = [...new Set([...uuidsFromGist, ...uuidsFromFirestore])];
-    let uuidsRankedVN = [];
-
+    // RANKED VN
     try {
         const rankedRes = await fetch("https://mcsrranked.com/api/leaderboard?country=vn");
         const rankedData = await rankedRes.json();
@@ -296,9 +274,15 @@ async function fetchUUIDs() {
     } catch (error) {
         console.error("Error fetching VN leaderboard:", error);
     }
-    const filtered = combined.filter(uuid => !uuidsRankedVN.includes(uuid));
+    const combined = [
+        ...new Set([
+            ...uuidsFromGist,
+            ...uuidsFromFirestore,
+            ...uuidsRankedVN
+        ])
+    ];
 
-    return filtered;
+    return combined;
 }
 
 document.getElementById('search').addEventListener('click', fetchDataUser);
