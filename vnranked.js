@@ -283,12 +283,15 @@ async function fetchUUIDs() {
 
     const combined = [...new Set([...uuidsFromGist, ...uuidsFromFirestore])];
     let uuidsRankedVN = [];
+
     try {
         const rankedRes = await fetch("https://mcsrranked.com/api/leaderboard?country=vn");
         const rankedData = await rankedRes.json();
 
-        if (rankedData?.data?.leaderboard) {
-            uuidsRankedVN = rankedData.data.leaderboard.map(p => p.uuid);
+        if (rankedData?.data?.users) {
+            uuidsRankedVN = rankedData.data.users.map(u => u.uuid);
+        } else {
+            console.warn("Ranked VN API returned no users array.");
         }
     } catch (error) {
         console.error("Error fetching VN leaderboard:", error);
@@ -297,7 +300,6 @@ async function fetchUUIDs() {
 
     return filtered;
 }
-
 
 document.getElementById('search').addEventListener('click', fetchDataUser);
 
