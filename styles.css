@@ -25,15 +25,25 @@ td, th {
   padding: 0.5em;
   text-align: center;
   /* margin: 100px; */
+  position: relative;
+}
+
+.arrow-rotated {
+    transform: rotate(180deg);
+    transition: transform 0.25s ease;
+}
+
+.arrow-normal {
+    transform: rotate(0deg);
+    transition: transform 0.25s ease;
 }
 
 thead {
-height: 50px;
-background-color: #102c30;
-color: white;
+  height: 50px;
+  background-color: #102c30;
+  color: white;
 }
 
-th:nth-child(5):hover,
 th:nth-child(6):hover,
 th:nth-child(2):hover,
 th:nth-child(1):hover {
@@ -41,42 +51,20 @@ th:nth-child(1):hover {
   background-color: #1f454b;
 }
 
-th:nth-child(3):hover {
+th:nth-child(3):hover,
+th:nth-child(4):hover,
+th:nth-child(5):hover{
   animation: animation 0.4s;
   cursor: pointer;
   background-color: #1f454b;
 }
 
-th:nth-child(4):hover {
-  animation: animation 0.4s;
-  cursor: pointer;
-  background-color: #1f454b;
-}
-
-
-th:nth-child(1), td:nth-child(1) {
-width: 10px;
-}
-
-th:nth-child(2), td:nth-child(2) {
-width: 200px;
-}
-
-th:nth-child(3), td:nth-child(3) {
-width: 90px;
-}
-
-th:nth-child(4), td:nth-child(4) {
-width: 110px;
-}
-
-th:nth-child(5), td:nth-child(5) {
-width: 60px;
-}
-
-th:nth-child(6), td:nth-child(6) {
-width: 100px;
-}
+th:nth-child(1), td:nth-child(1) { width: 5%; }
+th:nth-child(2), td:nth-child(2) { width: 30%; }
+th:nth-child(3), td:nth-child(3) { width: 10%; }
+th:nth-child(4), td:nth-child(4) { width: 15%; }
+th:nth-child(5), td:nth-child(5) { width: 12%; }
+th:nth-child(6), td:nth-child(6) { width: 10%; }
 
 td[data-date]::before {
   content: attr(data-date);
@@ -201,11 +189,6 @@ body {
   overflow-x: hidden;
 }
 
-.big {
-  display: block;
-  margin: 0 auto;
-}
-
 header {
   display: flex;
   justify-content: center;
@@ -225,46 +208,40 @@ h1 {
   font-weight:normal;
 }
 
+.logo-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .big {
-  position: absolute;
   width: 120px;
   height: 120px;
-  margin-left: -200px;
   image-rendering: pixelated;
-  /* filter: drop-shadow(0px 3px 2px rgba(0, 0, 0, 0.322)); */
 }
 
 #loading-contai{
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
   text-align: center;
-  /* width: 100vh; */
 }
 
 .image-pixelated {
   display: block;
   margin: 20px auto;
-  /* position: absolute; */
-  /* left: 50%; */
   image-rendering: pixelated;
   width: 120px;
   height: 120px;
 }
 
 .logo {
-  transform: translateX(50px) translateY(-7.8px);
+  transform: translateY(-8px);
   font-size: 2rem;
   font-family: 'Mcbl', monospace;
 }
 .lg:nth-child(1){
-  /* transform: translateY(-3px); */
-  font-size: 3.2rem;
+  font-size: 3.3rem;
 }
 
-.lg:nth-child(2){
-  /* transform: translateY(-50px); */
-}
 
 @font-face {
   font-family: Mcbl;
@@ -405,25 +382,18 @@ h1 {
   animation: animation 0.4s;
 }
 
-#Sub{
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  display: flex;
-  background-color: #0c2124;
-  border: 0px solid #8f2f6400;
-  margin-right: 170px;
-  right: 0;
-  position: absolute;
-  color: #fff;
-  border-radius: 0px;
-  font-size: 20px;
-  height: 35px;
-  width: 150px;
-  text-align: center;
-  font-family:"mcfont", monospace;
+#mode{
+  position: relative;
 }
 
+.button-container{
+  display: flex;
+  gap: 10px;
+  right: 10px;
+  position: absolute;
+}
+
+#Sub,
 #downloadButton {
   cursor: pointer;
   align-items: center;
@@ -431,9 +401,6 @@ h1 {
   display: flex;
   background-color: #0c2124;
   border: 0px solid #8f2f6400;
-  margin-right: 10px;
-  right: 0;
-  position: absolute;
   color: #fff;
   border-radius: 0px;
   font-size: 20px;
@@ -670,4 +637,50 @@ input{
 }
 .modal-exit2 {
   animation: fadeOut 0.5s;
+}
+
+
+/* phone */
+@media (max-width: 768px) 
+{
+  #rankedTable {
+    max-width: 100%;
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.8em;
+  }
+  #lead{
+    margin-left: 0px;
+    font-size: 1.8rem;
+  }
+  #showshower{
+    transform: translateX(0px);
+    position: static;
+  }
+  .button-container{
+    position: static;
+    margin-top: 5px;
+  }
+  #nav2{
+  }
+  #tt {
+    font-size: 1.8em;
+  }
+  #bg{
+    align-items: center;
+    justify-content: center;
+    padding-top: 8px;
+    height: 95px;
+    flex-direction: column;
+  }
+  .mode{
+    padding: 8px;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+  }
+  .mode button{
+    margin-right: 0px;
+    right: none;
+  }
 }

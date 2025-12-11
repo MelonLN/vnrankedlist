@@ -1,6 +1,11 @@
 let playerData = []; 
 let sortT = 1; 
 
+let chunks = null;
+let outerRing = null;
+let innerRing = null;
+let isDataLoaded = false; 
+
 function showLoading() {
     const loadingScreen = document.getElementById('loading-contai');
     const table = document.getElementById('rankedTable');
@@ -33,23 +38,35 @@ function updateLoadingProgress(loaded, total) {
 
     try {
         if (typeof outerRing !== 'undefined' && outerRing && typeof innerRing !== 'undefined' && innerRing) {
+            
+            outerRing.allowedRadius = Math.floor(progress * outerRing.maxRadius);
+            innerRing.allowedRadius = Math.floor(progress * innerRing.maxRadius);
 
-            outerRing.radius = Math.min(Math.floor(progress * outerRing.maxRadius), outerRing.maxRadius);
-            innerRing.radius = Math.min(Math.floor(progress * innerRing.maxRadius), innerRing.maxRadius);
-            if (typeof render === 'function') render();
+            const txt = document.getElementById('loading-progress-text');
+            if (txt) txt.textContent = `Loading ${loaded}/${total} (${Math.round(progress*100)}%)`;
+
+            if (loaded >= total) {
+                isDataLoaded = true;
+                
+                outerRing.allowedRadius = outerRing.maxRadius;
+                innerRing.allowedRadius = innerRing.maxRadius;
+
+                console.log('[LoadingProgress] All UUIDs processed - waiting for animation to finish.');
+                
+                setTimeout(() => {
+                    hideLoading();
+                }, 600); 
+            }
         } else {
             const txt = document.getElementById('loading-progress-text');
             if (txt) txt.textContent = `Loading ${loaded}/${total} (${Math.round(progress*100)}%)`;
+            
+            if (loaded >= total) {
+                setTimeout(() => { hideLoading(); }, 300);
+            }
         }
     } catch (e) {
         console.warn('Error updating rings:', e);
-    }
-
-    if (loaded >= total) {
-        console.log('[LoadingProgress] All UUIDs processed - hiding loading UI (with small delay for UX).');
-        setTimeout(() => {
-            hideLoading();
-        }, 300);
     }
 }
 
@@ -60,19 +77,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const radius = 10;
     const size = radius * 2 + 1;
     const speedMultiplier = size * size / 1000;
-    let chunks = null;
-    let outerRing = null;
-    let innerRing = null;
+    
     let prevTime = null;
 
     function generateRing(randomProbability, maxRadius, speed, loader) {
         return expandRing({
             radius: -1,
             maxRadius,
+            allowedRadius: -1, 
             neighbourUnloaded: [],
             allUnloaded: [],
             randomProbability: 0.08,
-            speed: 200,
+            baseSpeed: speed,
+            speed: speed,
             needsLoading: 0,
             loader
         });
@@ -80,7 +97,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function expandRing(ring) {
         const center = Math.floor(size / 2);
+        
         if (ring.radius >= ring.maxRadius) return ring;
+        if (ring.radius >= ring.allowedRadius) return ring; 
 
         ring.radius++;
         ring.neighbourUnloaded = [];
@@ -137,6 +156,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function loadMultipleFromRing(ring) {
         while (ring.needsLoading >= 1) {
+            if (ring.allUnloaded.length === 0 && ring.neighbourUnloaded.length === 0 && ring.radius >= ring.allowedRadius) {
+                ring.needsLoading = 0;
+                break;
+            }
+
             loadFromRing(ring);
             ring.needsLoading--;
         }
@@ -159,20 +183,37 @@ document.addEventListener('DOMContentLoaded', function () {
         requestAnimationFrame(animate);
     }
 
+    function updateRingSpeed(ring, delta) {
+        const lag = ring.allowedRadius - ring.radius;
+        
+        let currentSpeed = ring.baseSpeed;
+
+        if (lag > 0) {
+            currentSpeed = ring.baseSpeed + (lag * 800); 
+        }
+
+        if (isDataLoaded) {
+            currentSpeed = 500; 
+        }
+
+        ring.speed = currentSpeed;
+        ring.needsLoading += ring.speed * delta * speedMultiplier;
+        loadMultipleFromRing(ring);
+    }
+
     function update(delta) {
         if (!outerRing || !innerRing) return;
 
-        outerRing.needsLoading += outerRing.speed * delta * speedMultiplier;
-        innerRing.needsLoading += innerRing.speed * delta * speedMultiplier;
-
-        loadMultipleFromRing(outerRing);
-        loadMultipleFromRing(innerRing);
+        updateRingSpeed(outerRing, delta);
+        updateRingSpeed(innerRing, delta);
     }
 
     function render() {
         if (!canvas || !chunks) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+        
+        ctx.clearRect(0, 0, size, size);
 
         for (let x = 0; x < size; x++) {
             for (let y = 0; y < size; y++) {
@@ -193,34 +234,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         ctx.fillStyle = '#ffffff';
                         break;
                 }
-
-                ctx.fillRect(x, y, 1, 1);
+                
+                if (chunks[x][y] !== 0) {
+                    ctx.fillRect(x, y, 1, 1);
+                }
             }
         }
     }
-
-function updateLoadingProgress(loaded, total) {
-    const progress = loaded / total;
-    console.log(`Progress: ${loaded}/${total} = ${Math.round(progress * 100)}%`);
-
-    if (outerRing && innerRing) {
-        outerRing.radius = Math.floor(progress * outerRing.maxRadius);
-        innerRing.radius = Math.floor(progress * innerRing.maxRadius);
-    }
-
-    render();
-
-    if (loaded === total) {
-        const loadingScreen = document.getElementById('loading-contai');
-        const table = document.getElementById('rankedTable');
-
-        if (table && loadingScreen) {
-            table.style.display = 'table';
-            loadingScreen.style.display = 'none';
-        }
-    }
-}
-
 
     function outerLoader(pos) {
         if (!chunks) return false;
@@ -229,8 +249,10 @@ function updateLoadingProgress(loaded, total) {
             for (let dy = -2; dy <= 2; dy++) {
                 const level = 3 - Math.max(Math.abs(dx), Math.abs(dy));
                 const newPos = { x: pos.x + dx, y: pos.y + dy };
-
-                chunks[newPos.x][newPos.y] = Math.max(chunks[newPos.x][newPos.y], level);
+                
+                if (newPos.x >= 0 && newPos.x < size && newPos.y >= 0 && newPos.y < size) {
+                    chunks[newPos.x][newPos.y] = Math.max(chunks[newPos.x][newPos.y], level);
+                }
             }
         }
 
@@ -252,9 +274,10 @@ function updateLoadingProgress(loaded, total) {
                 chunks[x].push(0);
             }
         }
-
-        outerRing = generateRing(0.1, radius - 2, 1000, outerLoader);
-        innerRing = generateRing(0.5, radius - 1, 500, innerLoader);
+        
+        isDataLoaded = false;
+        outerRing = generateRing(0.1, radius - 2, 150, outerLoader);
+        innerRing = generateRing(0.5, radius - 1, 80, innerLoader);
     }
 
     init();
@@ -264,7 +287,9 @@ function updateLoadingProgress(loaded, total) {
 async function fetchUUIDs() {
     let uuidsFromGist = [];
     let uuidsFromFirestore = [];
+    let uuidsRankedVN = [];
 
+    // GIST
     try {
         const response = await fetch(
           'https://gist.githubusercontent.com/babeoban/b7b4db7f956878666740924864fdbb02/raw/663c46d38519d3607e2a9a718de8cd49e1bafd44/uuids.json'
@@ -274,6 +299,7 @@ async function fetchUUIDs() {
         console.error('Error fetching UUIDs from gist:', error);
     }
 
+    // FIRESTORE
     try {
         const snapshot = await window.getDocs(window.collection(window.db, "uuids"));
         uuidsFromFirestore = snapshot.docs.map(doc => doc.data().uuid);
@@ -281,11 +307,29 @@ async function fetchUUIDs() {
         console.error('Error fetching UUIDs from Firestore:', error);
     }
 
-    const allUUIDs = [...new Set([...uuidsFromGist, ...uuidsFromFirestore])];
+    // RANKED VN
+    try {
+        const rankedRes = await fetch("https://mcsrranked.com/api/leaderboard?country=vn");
+        const rankedData = await rankedRes.json();
 
-    return allUUIDs;
+        if (rankedData?.data?.users) {
+            uuidsRankedVN = rankedData.data.users.map(u => u.uuid);
+        } else {
+            console.warn("Ranked VN API returned no users array.");
+        }
+    } catch (error) {
+        console.error("Error fetching VN leaderboard:", error);
+    }
+    const combined = [
+        ...new Set([
+            ...uuidsFromGist,
+            ...uuidsFromFirestore,
+            ...uuidsRankedVN
+        ])
+    ];
+
+    return combined;
 }
-
 
 document.getElementById('search').addEventListener('click', fetchDataUser);
 
@@ -480,8 +524,8 @@ async function fetchDataForUUIDs() {
         let loadedCount = 0;
         const results = [];
 
-        const BATCH_SIZE = 6;      
-        const BATCH_DELAY_MS = 250; 
+        const BATCH_SIZE = 30;      
+        const BATCH_DELAY_MS = 100; 
 
         for (let i = 0; i < totalUuids; i += BATCH_SIZE) {
             const batch = uuids.slice(i, i + BATCH_SIZE);
@@ -553,16 +597,26 @@ async function fetchDataForUUIDs() {
 
 function sortPlayerData() {
     if (sortT == 1) {
+        // Elo
         playerData.sort((a, b) => b.eloRate - a.eloRate);
-    } else {
+    } else if (sortT == 2) {
+        // Best time
         playerData.sort((a, b) => {
             if (!a.bestTimeRanked && !b.bestTimeRanked) return 0;
             if (!a.bestTimeRanked) return 1;
             if (!b.bestTimeRanked) return -1;
             return a.bestTimeRanked - b.bestTimeRanked;
         });
+    } else if (sortT == 3) {
+        // Winrate
+        playerData.sort((a, b) => {
+            const winA = a.winsRanked + a.losesRanked > 0 ? (a.winsRanked / (a.winsRanked + a.losesRanked)) : 0;
+            const winB = b.winsRanked + b.losesRanked > 0 ? (b.winsRanked / (b.winsRanked + b.losesRanked)) : 0;
+            return winB - winA;
+        });
     }
 }
+
 
 function formatTime(timeInMs) {
     const minutes = Math.floor(timeInMs / (60 * 1000));
@@ -574,25 +628,52 @@ function formatTime(timeInMs) {
 document.addEventListener('DOMContentLoaded', function() {
     const eloHeader = document.querySelector('th:nth-child(3)');
     const bestTimeHeader = document.querySelector('th:nth-child(4)');
+    const winrateHeader = document.querySelector('th:nth-child(5)');
 
-    eloHeader.addEventListener('click', function() {
+    const eloArrow = document.getElementById("eloArrow");
+    const timeArrow = document.getElementById("timeArrow");
+    const winArrow = document.getElementById("winArrow");
+
+    function resetAllArrows() {
+        [eloArrow, timeArrow, winArrow].forEach(arrow => {
+            arrow.classList.remove("arrow-rotated", "arrow-normal");
+            arrow.classList.add("arrow-normal");
+        });
+    }
+
+    function activateArrow(arrow) {
+        resetAllArrows();
+        arrow.classList.remove("arrow-normal");
+        arrow.classList.add("arrow-rotated");
+    }
+
+    eloHeader.addEventListener('click', function () {
         sortT = 1;
         sortPlayerData();
         displayPlayerData();
+        activateArrow(eloArrow);
     });
 
-    bestTimeHeader.addEventListener('click', function() {
+    bestTimeHeader.addEventListener('click', function () {
         sortT = 2;
         sortPlayerData();
         displayPlayerData();
+        activateArrow(timeArrow);
     });
 
-    fetchDataForUUIDs(); 
+    winrateHeader.addEventListener('click', function () {
+        sortT = 3;
+        sortPlayerData();
+        displayPlayerData();
+        activateArrow(winArrow);
+    });
+
+    fetchDataForUUIDs();
 });
 
-setInterval(function() {
-    fetchDataForUUIDs();
-}, 180000);
+// setInterval(function() {
+//     fetchDataForUUIDs();
+// }, 180000);
 
 function displayPlayerData() {
     const rankedBody = document.getElementById('rankedBody');
@@ -712,23 +793,22 @@ document.getElementById('downloadButton').addEventListener('click', downloadCSV)
 
 let countDownDate;
 
-fetch('https://mcsrranked.com/api/leaderboard?season=current')
+fetch('https://mcsrranked.com/api/leaderboard')
   .then(response => response.json())
   .then(data => {
     if (data.status === "success") {
       const seasonNumber = data.data.season.number;
-      
+     
       document.getElementById("tt").textContent = `Season ${seasonNumber}`;
-      
+     
       countDownDate = new Date(data.data.season.endsAt * 1000);
     } else {
       console.error("Error fetching data from API:", data.message);
     }
-
     let x = setInterval(function() {
     }, 1000);
   })
-  .catch(error => console.error("Error fetching data:", error));
+.catch(error => console.error("Error fetching data:", error));
 
 let x = setInterval(function() {
     if (!countDownDate) return; 

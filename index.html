@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>VNMCSR Ranked Data</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="./img/egg.png" type="image/x-icon">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -13,11 +14,12 @@
 </head>
 <body>
     <header>
-        <img class="big" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAOHSURBVHhe7dxBahRBAIbRRLyAB3GRhdfxGIInEDyG13GRhQfxAoIm0EuZApuypvp7D0J6M9M9m4+B+pMHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADY0OPx+279fnFcwnYeXxyXd+nN8RsIEgAIEwAIEwAIEwAIEwAIEwAI234H8O7903EF/9/PH8/H1b9ZvRPwDQDCBADCBADCBADCBADCBADCBADCLr8D+PTt7XG1p68ffx1Xf7f75xtZ/flH9x8Z7QTsAIBlBADCBADCBADCBADCBADCBADC8juAz0/fj6s1vjx/OK7mOPv5zj7f6P6rP//o/nYAwGUJAIQJAIQJAIQJAIQJAIQJAITZAWx+Tj37+Wc/38jq57cDAC5LACBMACBMACBMACBMACBMACBMAFjq9Rz+1s/rOf6tH84RAAgTAAgTAAgTAAgTAAgTAAgTAAjz/wAWnyW/nnWfMXr+1e+/++v9PwDgsgQAwgQAwgQAwgQAwgQAwgQAwuwAJp+jj8w+555t9jn8yNnPbwcAZAkAhAkAhAkAhAkAhAkAhAkAhNkBXHwHMPucffXzjZy9vx0AcFkCAGECAGECAGECAGECAGECAGH5HQDcYgcAXJYAQJgAQJgAQJgAQJgAQJgAQJj/B7D536uPXj/b7s83YgcAXJYAQJgAQJgAQJgAQJgAQJgAQJgdwOQdwO7vf9bq5zt7fzsA4LIEAMIEAMIEAMIEAMIEAMIEAMLsAAbnxGetPuc+a/edgh3Abb4BQJgAQJgAQJgAQJgAQJgAQJgAQJgdwORz6t3f/yw7ADsA4E4JAIQJAIQJAIQJAIQJAIQJAITZAWx+Tm0HcJsdwG2+AUCYAECYAECYAECYAECYAECYAECYHcDkc+LZ9x+9frbdn2/EDgC4LAGAMAGAMAGAMAGAMAGAMAGAsPwO4KyzOwDWOnvOP2IHANwtAYAwAYAwAYAwAYAwAYAwAYCwy+8AYCU7AOBuCQCECQCECQCECQCECQCECQCEbb8DGLETYKbROf+IHQCwjABAmABAmABAmABAmABAmABA2N3vAEbO7gRgptXn/CO+AUCYAECYAECYAECYAECYAECYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALCRh4c/iV1wPU7yGDQAAAAASUVORK5CYII=">
-        <div class="gap"></div>
-        <div class="logo">
-          <p class="lg">VNMCSR</p>
-          <p class="lg">Ranked Data</p>
+        <div class="logo-container">
+            <img class="big" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAOHSURBVHhe7dxBahRBAIbRRLyAB3GRhdfxGIInEDyG13GRhQfxAoIm0EuZApuypvp7D0J6M9M9m4+B+pMHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADY0OPx+279fnFcwnYeXxyXd+nN8RsIEgAIEwAIEwAIEwAIEwAIEwAI234H8O7903EF/9/PH8/H1b9ZvRPwDQDCBADCBADCBADCBADCBADCBADCLr8D+PTt7XG1p68ffx1Xf7f75xtZ/flH9x8Z7QTsAIBlBADCBADCBADCBADCBADCBADC8juAz0/fj6s1vjx/OK7mOPv5zj7f6P6rP//o/nYAwGUJAIQJAIQJAIQJAIQJAIQJAITZAWx+Tj37+Wc/38jq57cDAC5LACBMACBMACBMACBMACBMACBMAFjq9Rz+1s/rOf6tH84RAAgTAAgTAAgTAAgTAAgTAAgTAAjz/wAWnyW/nnWfMXr+1e+/++v9PwDgsgQAwgQAwgQAwgQAwgQAwgQAwuwAJp+jj8w+555t9jn8yNnPbwcAZAkAhAkAhAkAhAkAhAkAhAkAhNkBXHwHMPucffXzjZy9vx0AcFkCAGECAGECAGECAGECAGECAGH5HQDcYgcAXJYAQJgAQJgAQJgAQJgAQJgAQJj/B7D536uPXj/b7s83YgcAXJYAQJgAQJgAQJgAQJgAQJgAQJgdwOQdwO7vf9bq5zt7fzsA4LIEAMIEAMIEAMIEAMIEAMIEAMLsAAbnxGetPuc+a/edgh3Abb4BQJgAQJgAQJgAQJgAQJgAQJgAQJgdwORz6t3f/yw7ADsA4E4JAIQJAIQJAIQJAIQJAIQJAITZAWx+Tm0HcJsdwG2+AUCYAECYAECYAECYAECYAECYAECYHcDkc+LZ9x+9frbdn2/EDgC4LAGAMAGAMAGAMAGAMAGAMAGAsPwO4KyzOwDWOnvOP2IHANwtAYAwAYAwAYAwAYAwAYAwAYCwy+8AYCU7AOBuCQCECQCECQCECQCECQCECQCEbb8DGLETYKbROf+IHQCwjABAmABAmABAmABAmABAmABA2N3vAEbO7gRgptXn/CO+AUCYAECYAECYAECYAECYAECYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALCRh4c/iV1wPU7yGDQAAAAASUVORK5CYII=">
+            <div class="logo">
+                <p class="lg">VNMCSR</p>
+                <p class="lg">Ranked Data</p>
+            </div>
         </div>
     </header>
     <div id="bg">
@@ -26,14 +28,16 @@
             <ul id="nav2">
                 <li><a href="https://discord.gg/XKyCpdaR6C"><img id="lol3" src="./img/Discord.png" alt="Discord"></a></li>
                 <li><a href="https://github.com/MelonLN/vnrankedlist"><img id="lol2" src="./img/Github.png" alt="Github"></a></li>
-                <li id="lol4"><a href="https://mcsrranked.com/stats"><img id="lol" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAOHSURBVHhe7dxBahRBAIbRRLyAB3GRhdfxGIInEDyG13GRhQfxAoIm0EuZApuypvp7D0J6M9M9m4+B+pMHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADY0OPx+279fnFcwnYeXxyXd+nN8RsIEgAIEwAIEwAIEwAIEwAIEwAI234H8O7903EF/9/PH8/H1b9ZvRPwDQDCBADCBADCBADCBADCBADCBADCLr8D+PTt7XG1p68ffx1Xf7f75xtZ/flH9x8Z7QTsAIBlBADCBADCBADCBADCBADCBADC8juAz0/fj6s1vjx/OK7mOPv5zj7f6P6rP//o/nYAwGUJAIQJAIQJAIQJAIQJAIQJAITZAWx+Tj37+Wc/38jq57cDAC5LACBMACBMACBMACBMACBMACBMAFjq9Rz+1s/rOf6tH84RAAgTAAgTAAgTAAgTAAgTAAgTAAjz/wAWnyW/nnWfMXr+1e+/++v9PwDgsgQAwgQAwgQAwgQAwgQAwgQAwuwAJp+jj8w+555t9jn8yNnPbwcAZAkAhAkAhAkAhAkAhAkAhAkAhNkBXHwHMPucffXzjZy9vx0AcFkCAGECAGECAGECAGECAGECAGH5HQDcYgcAXJYAQJgAQJgAQJgAQJgAQJgAQJj/B7D536uPXj/b7s83YgcAXJYAQJgAQJgAQJgAQJgAQJgAQJgdwOQdwO7vf9bq5zt7fzsA4LIEAMIEAMIEAMIEAMIEAMIEAMLsAAbnxGetPuc+a/edgh3Abb4BQJgAQJgAQJgAQJgAQJgAQJgAQJgdwORz6t3f/yw7ADsA4E4JAIQJAIQJAIQJAIQJAIQJAITZAWx+Tm0HcJsdwG2+AUCYAECYAECYAECYAECYAECYAECYHcDkc+LZ9x+9frbdn2/EDgC4LAGAMAGAMAGAMAGAMAGAMAGAsPwO4KyzOwDWOnvOP2IHANwtAYAwAYAwAYAwAYAwAYAwAYCwy+8AYCU7AOBuCQCECQCECQCECQCECQCECQCEbb8DGLETYKbROf+IHQCwjABAmABAmABAmABAmABAmABA2N3vAEbO7gRgptXn/CO+AUCYAECYAECYAECYAECYAECYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALCRh4c/iV1wPU7yGDQAAAAASUVORK5CYII=" alt="Github"></a></li>
+                <li><a href="https://mcsrranked.com/stats"><img id="lol" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAOHSURBVHhe7dxBahRBAIbRRLyAB3GRhdfxGIInEDyG13GRhQfxAoIm0EuZApuypvp7D0J6M9M9m4+B+pMHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADY0OPx+279fnFcwnYeXxyXd+nN8RsIEgAIEwAIEwAIEwAIEwAIEwAI234H8O7903EF/9/PH8/H1b9ZvRPwDQDCBADCBADCBADCBADCBADCBADCLr8D+PTt7XG1p68ffx1Xf7f75xtZ/flH9x8Z7QTsAIBlBADCBADCBADCBADCBADCBADC8juAz0/fj6s1vjx/OK7mOPv5zj7f6P6rP//o/nYAwGUJAIQJAIQJAIQJAIQJAIQJAITZAWx+Tj37+Wc/38jq57cDAC5LACBMACBMACBMACBMACBMACBMAFjq9Rz+1s/rOf6tH84RAAgTAAgTAAgTAAgTAAgTAAgTAAjz/wAWnyW/nnWfMXr+1e+/++v9PwDgsgQAwgQAwgQAwgQAwgQAwgQAwuwAJp+jj8w+555t9jn8yNnPbwcAZAkAhAkAhAkAhAkAhAkAhAkAhNkBXHwHMPucffXzjZy9vx0AcFkCAGECAGECAGECAGECAGECAGH5HQDcYgcAXJYAQJgAQJgAQJgAQJgAQJgAQJj/B7D536uPXj/b7s83YgcAXJYAQJgAQJgAQJgAQJgAQJgAQJgdwOQdwO7vf9bq5zt7fzsA4LIEAMIEAMIEAMIEAMIEAMIEAMLsAAbnxGetPuc+a/edgh3Abb4BQJgAQJgAQJgAQJgAQJgAQJgAQJgdwORz6t3f/yw7ADsA4E4JAIQJAIQJAIQJAIQJAIQJAITZAWx+Tm0HcJsdwG2+AUCYAECYAECYAECYAECYAECYAECYHcDkc+LZ9x+9frbdn2/EDgC4LAGAMAGAMAGAMAGAMAGAMAGAsPwO4KyzOwDWOnvOP2IHANwtAYAwAYAwAYAwAYAwAYAwAYCwy+8AYCU7AOBuCQCECQCECQCECQCECQCECQCEbb8DGLETYKbROf+IHQCwjABAmABAmABAmABAmABAmABA2N3vAEbO7gRgptXn/CO+AUCYAECYAECYAECYAECYAECYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALCRh4c/iV1wPU7yGDQAAAAASUVORK5CYII=" alt="Github"></a></li>
             </ul>
         </div>
     </div>
     <div class="mode">
         <a id="tt">Season </a>
-        <button id="downloadButton">Download Table</button>
-        <button id="Sub">Subscribe</button>
+        <div class="button-container">
+            <button id="downloadButton">Download Table</button>
+            <button id="Sub">Subscribe</button>
+        </div>
     </div>
     <div class="time">
         <span id="time"></span>
@@ -65,9 +69,132 @@
             <tr>
                 <th>#</th>
                 <th>Name</th>
-                <th>Elo</th>
-                <th>Best time</th>
-                <th>Winrate</th>
+                <th id="eloHeader">Elo 
+                    <svg id="eloArrow" xmlns="http://www.w3.org/2000/svg"
+                        width="12" height="12" viewBox="0 0 224 112"
+                        shape-rendering="crispEdges">
+                    <rect x="96" y="0"   width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="16"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="16"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="16" width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="32" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="32" width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="32" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="160" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="16" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="32" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="160" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="176" y="80" width="16" height="16" fill="#ffffff"/>
+                    </svg>
+                </th>
+                <th id="bestTimeHeader">Best time
+                    <svg id="timeArrow" xmlns="http://www.w3.org/2000/svg"
+                        width="12" height="12" viewBox="0 0 224 112"
+                        shape-rendering="crispEdges">
+                    <rect x="96" y="0"   width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="16"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="16"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="16" width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="32" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="32" width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="32" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="160" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="16" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="32" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="160" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="176" y="80" width="16" height="16" fill="#ffffff"/>
+                    </svg>
+                </th>
+                <th id="winrateHeader">Winrate
+                    <svg id="winArrow" xmlns="http://www.w3.org/2000/svg"
+                        width="12" height="12" viewBox="0 0 224 112"
+                        shape-rendering="crispEdges">
+                    <rect x="96" y="0"   width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="16"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="16"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="16" width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="32"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="32" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="32" width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="48"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="48" width="16" height="16" fill="#ffffff"/>
+                    <rect x="32" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="64"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="160" y="64" width="16" height="16" fill="#ffffff"/>
+                    <rect x="16" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="32" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="48" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="64" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="80" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="96" y="80"  width="16" height="16" fill="#ffffff"/>
+                    <rect x="112" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="128" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="144" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="160" y="80" width="16" height="16" fill="#ffffff"/>
+                    <rect x="176" y="80" width="16" height="16" fill="#ffffff"/>
+                    </svg>
+                </th>
                 <th>FF rate</th>
             </tr>
         </thead>
