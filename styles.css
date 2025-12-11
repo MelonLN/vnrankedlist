@@ -22,7 +22,7 @@
 }
 
 td, th {
-  padding: 0.5em;
+  padding: 8px;
   text-align: center;
   /* margin: 100px; */
   position: relative;
@@ -59,12 +59,12 @@ th:nth-child(5):hover{
   background-color: #1f454b;
 }
 
-th:nth-child(1), td:nth-child(1) { width: 5%; }
+th:nth-child(1), td:nth-child(1) { width: 4%; padding: 0px; }
 th:nth-child(2), td:nth-child(2) { width: 30%; }
 th:nth-child(3), td:nth-child(3) { width: 10%; }
 th:nth-child(4), td:nth-child(4) { width: 15%; }
 th:nth-child(5), td:nth-child(5) { width: 12%; }
-th:nth-child(6), td:nth-child(6) { width: 10%; }
+th:nth-child(6), td:nth-child(6) { width: 11%; }
 
 td[data-date]::before {
   content: attr(data-date);
@@ -92,12 +92,6 @@ tbody tr:hover {
 tbody.link-select tr:hover {
   background-color: #e6f7ff;
   animation: animation 0.4s;
-}
-
-tbody td:not(:nth-child(4)),
-thead td {
-  padding: 8px;
-  text-align: left;
 }
 
 tbody td:nth-child(4) a {
@@ -656,7 +650,7 @@ input{
     max-width: 100%;
     table-layout: fixed;
     width: 100%;
-    font-size: 0.9em;
+    font-size: 0.85em;
   }
   #lead{
     margin-left: 0px;
@@ -691,5 +685,10 @@ input{
   .mode button{
     margin-right: 0px;
     right: none;
+  }
+  tbody td,
+  thead td {
+    padding: 8px;
+    text-align: center;
   }
 }
