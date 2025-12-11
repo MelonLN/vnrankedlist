@@ -1,16 +1,6 @@
-let playerData = [];
-let sortT = 1;
+let playerData = []; 
+let sortT = 1; 
 
-// Loading animation globals
-let chunks = null;
-let outerRing = null;
-let innerRing = null;
-let prevTime = null;
-const radius = 10;
-const size = radius * 2 + 1;
-const speedMultiplier = size * size / 1000;
-
-//Loading UI helpers
 function showLoading() {
     const loadingScreen = document.getElementById('loading-contai');
     const table = document.getElementById('rankedTable');
@@ -39,37 +29,20 @@ function hideLoading() {
 
 function updateLoadingProgress(loaded, total) {
     const progress = total ? (loaded / total) : 1;
-    const percent = Math.round(progress * 100);
-
-    console.log(`[LoadingProgress] ${loaded}/${total} (${percent}%)`);
-
-    let txt = document.getElementById('loading-progress-text');
-    if (!txt) {
-        const loadingScreenEl = document.getElementById('loading-contai');
-        if (loadingScreenEl) {
-            txt = document.createElement('div');
-            txt.id = 'loading-progress-text';
-            txt.style.marginTop = '8px';
-            txt.style.fontSize = '13px';
-            txt.style.color = 'white';
-            loadingScreenEl.appendChild(txt);
-        }
-    }
-    if (txt) txt.textContent = `Loading ${loaded}/${total} (${percent}%)`;
+    console.log(`[LoadingProgress] ${loaded}/${total} (${Math.round(progress*100)}%)`);
 
     try {
-        if (outerRing && innerRing) {
-            outerRing.targetRadius = Math.min(Math.floor(progress * outerRing.maxRadius), outerRing.maxRadius);
-            innerRing.targetRadius = Math.min(Math.floor(progress * innerRing.maxRadius), innerRing.maxRadius);
+        if (typeof outerRing !== 'undefined' && outerRing && typeof innerRing !== 'undefined' && innerRing) {
+
+            outerRing.radius = Math.min(Math.floor(progress * outerRing.maxRadius), outerRing.maxRadius);
+            innerRing.radius = Math.min(Math.floor(progress * innerRing.maxRadius), innerRing.maxRadius);
+            if (typeof render === 'function') render();
+        } else {
+            const txt = document.getElementById('loading-progress-text');
+            if (txt) txt.textContent = `Loading ${loaded}/${total} (${Math.round(progress*100)}%)`;
         }
     } catch (e) {
-        console.warn('Error updating rings in updateLoadingProgress:', e);
-    }
-
-    try {
-        if (typeof render === 'function') render();
-    } catch (e) {
-        console.warn('Error calling render in updateLoadingProgress:', e);
+        console.warn('Error updating rings:', e);
     }
 
     if (loaded >= total) {
@@ -80,19 +53,26 @@ function updateLoadingProgress(loaded, total) {
     }
 }
 
+
 document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('loadingCanvas');
-    const ctx = canvas ? canvas.getContext('2d') : null;
+    const ctx = canvas.getContext('2d');
+    const radius = 10;
+    const size = radius * 2 + 1;
+    const speedMultiplier = size * size / 1000;
+    let chunks = null;
+    let outerRing = null;
+    let innerRing = null;
+    let prevTime = null;
 
     function generateRing(randomProbability, maxRadius, speed, loader) {
         return expandRing({
             radius: -1,
-            targetRadius: 0,
             maxRadius,
             neighbourUnloaded: [],
             allUnloaded: [],
-            randomProbability,
-            speed,
+            randomProbability: 0.08,
+            speed: 200,
             needsLoading: 0,
             loader
         });
@@ -101,8 +81,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function expandRing(ring) {
         const center = Math.floor(size / 2);
         if (ring.radius >= ring.maxRadius) return ring;
-
-        if (ring.radius < 0) ring.radius = 0;
 
         ring.radius++;
         ring.neighbourUnloaded = [];
@@ -173,59 +151,50 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!chunks) init();
 
         const delta = prevTime ? (time - prevTime) / 1000 : 0;
-        if (outerRing && innerRing) {
-            outerRing.needsLoading += outerRing.speed * delta * speedMultiplier;
-            innerRing.needsLoading += innerRing.speed * delta * speedMultiplier;
 
-            loadMultipleFromRing(outerRing);
-            loadMultipleFromRing(innerRing);
-
-            const smoothFactorOuter = Math.min(1, outerRing.speed * delta / 400);
-            const smoothFactorInner = Math.min(1, innerRing.speed * delta / 400);
-
-            if (typeof outerRing.targetRadius === 'number') {
-                outerRing.radius = Math.round(outerRing.radius + (outerRing.targetRadius - outerRing.radius) * smoothFactorOuter);
-            }
-            if (typeof innerRing.targetRadius === 'number') {
-                innerRing.radius = Math.round(innerRing.radius + (innerRing.targetRadius - innerRing.radius) * smoothFactorInner);
-            }
-        }
-
+        update(delta);
         render();
+
         prevTime = time;
         requestAnimationFrame(animate);
     }
 
+    function update(delta) {
+        if (!outerRing || !innerRing) return;
+
+        outerRing.needsLoading += outerRing.speed * delta * speedMultiplier;
+        innerRing.needsLoading += innerRing.speed * delta * speedMultiplier;
+
+        loadMultipleFromRing(outerRing);
+        loadMultipleFromRing(innerRing);
+    }
+
     function render() {
         if (!canvas || !chunks) return;
-        const ctxLocal = canvas.getContext('2d');
-        if (!ctxLocal) return;
-
-        ctxLocal.clearRect(0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
         for (let x = 0; x < size; x++) {
             for (let y = 0; y < size; y++) {
                 switch (chunks[x][y]) {
                     case 0:
-                        ctxLocal.fillStyle = '#ffffff00';
+                        ctx.fillStyle = '#ffffff00';
                         break;
                     case 1:
-                        ctxLocal.fillStyle = '#303572';
+                        ctx.fillStyle = '#303572';
                         break;
                     case 2:
-                        ctxLocal.fillStyle = '#87ce34';
+                        ctx.fillStyle = '#87ce34';
                         break;
                     case 3:
-                        ctxLocal.fillStyle = '#cccccc';
+                        ctx.fillStyle = '#cccccc';
                         break;
                     case 4:
-                        ctxLocal.fillStyle = '#ffffff';
+                        ctx.fillStyle = '#ffffff';
                         break;
-                    default:
-                        ctxLocal.fillStyle = '#ffffff00';
                 }
 
-                ctxLocal.fillRect(x, y, 1, 1);
+                ctx.fillRect(x, y, 1, 1);
             }
         }
     }
@@ -237,9 +206,6 @@ document.addEventListener('DOMContentLoaded', function () {
             for (let dy = -2; dy <= 2; dy++) {
                 const level = 3 - Math.max(Math.abs(dx), Math.abs(dy));
                 const newPos = { x: pos.x + dx, y: pos.y + dy };
-
-                // bounds check
-                if (newPos.x < 0 || newPos.x >= size || newPos.y < 0 || newPos.y >= size) continue;
 
                 chunks[newPos.x][newPos.y] = Math.max(chunks[newPos.x][newPos.y], level);
             }
@@ -264,20 +230,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        outerRing = generateRing(0.08, radius - 2, 1000, outerLoader);
+        outerRing = generateRing(0.1, radius - 2, 1000, outerLoader);
         innerRing = generateRing(0.5, radius - 1, 500, innerLoader);
-
-        outerRing.radius = 0;
-        outerRing.targetRadius = 0;
-        innerRing.radius = 0;
-        innerRing.targetRadius = 0;
     }
 
     init();
     requestAnimationFrame(animate);
 });
 
-// Fetch / processing logic
 async function fetchUUIDs() {
     let uuidsFromGist = [];
     let uuidsFromFirestore = [];
@@ -519,7 +479,7 @@ async function fetchDataForUUIDs() {
         const results = [];
 
         const BATCH_SIZE = 30;      
-        const BATCH_DELAY_MS = 0; 
+        const BATCH_DELAY_MS = 500; 
 
         for (let i = 0; i < totalUuids; i += BATCH_SIZE) {
             const batch = uuids.slice(i, i + BATCH_SIZE);
