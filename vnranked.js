@@ -712,23 +712,23 @@ document.getElementById('downloadButton').addEventListener('click', downloadCSV)
 
 let countDownDate;
 
-fetch('https://mcsrranked.com/api/leaderboard?season=current')
+// Gọi API mà không có param season (default = current)
+fetch('https://mcsrranked.com/api/leaderboard')
   .then(response => response.json())
   .then(data => {
     if (data.status === "success") {
       const seasonNumber = data.data.season.number;
-      
+     
       document.getElementById("tt").textContent = `Season ${seasonNumber}`;
-      
+     
       countDownDate = new Date(data.data.season.endsAt * 1000);
     } else {
       console.error("Error fetching data from API:", data.message);
     }
-
     let x = setInterval(function() {
     }, 1000);
   })
-  .catch(error => console.error("Error fetching data:", error));
+.catch(error => console.error("Error fetching data:", error));
 
 let x = setInterval(function() {
     if (!countDownDate) return; 
