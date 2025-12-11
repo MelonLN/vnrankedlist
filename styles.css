@@ -234,9 +234,13 @@ h1 {
 }
 
 .logo {
-  transform: translateY(-8px);
+  transform: translateY(-1px);
   font-size: 2rem;
   font-family: 'Mcbl', monospace;
+}
+
+.lg{
+  line-height: 1;
 }
 .lg:nth-child(1){
   font-size: 3.3rem;
@@ -245,6 +249,8 @@ h1 {
 
 @font-face {
   font-family: Mcbl;
+  ascent-override: 85%;
+  descent-override: 15%;
   src: url(./font/MinecraftTen-VGORe.ttf);
 }
 
