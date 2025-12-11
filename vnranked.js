@@ -281,9 +281,21 @@ async function fetchUUIDs() {
         console.error('Error fetching UUIDs from Firestore:', error);
     }
 
-    const allUUIDs = [...new Set([...uuidsFromGist, ...uuidsFromFirestore])];
+    const combined = [...new Set([...uuidsFromGist, ...uuidsFromFirestore])];
+    let uuidsRankedVN = [];
+    try {
+        const rankedRes = await fetch("https://mcsrranked.com/api/leaderboard?country=vn");
+        const rankedData = await rankedRes.json();
 
-    return allUUIDs;
+        if (rankedData?.data?.leaderboard) {
+            uuidsRankedVN = rankedData.data.leaderboard.map(p => p.uuid);
+        }
+    } catch (error) {
+        console.error("Error fetching VN leaderboard:", error);
+    }
+    const filtered = combined.filter(uuid => !uuidsRankedVN.includes(uuid));
+
+    return filtered;
 }
 
 
@@ -712,7 +724,6 @@ document.getElementById('downloadButton').addEventListener('click', downloadCSV)
 
 let countDownDate;
 
-// Gọi API mà không có param season (default = current)
 fetch('https://mcsrranked.com/api/leaderboard')
   .then(response => response.json())
   .then(data => {
