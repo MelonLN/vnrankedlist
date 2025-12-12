@@ -53,7 +53,7 @@ thead th {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
 }
 
-th:nth-child(6):hover,
+th:nth-child(7):hover,
 th:nth-child(2):hover,
 th:nth-child(1):hover {
   animation: animation 0.4s;
