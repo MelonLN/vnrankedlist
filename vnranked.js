@@ -571,6 +571,8 @@ async function fetchDataForUUIDs() {
             const losesRanked = data.statistics?.season?.loses?.ranked || 0;
             const forfeitsRanked = data.statistics?.season?.forfeits?.ranked || 0;
             const playedMatchesRanked = data.statistics?.season?.playedMatches?.ranked || 0;
+            const completionTimeRanked = data.statistics?.season?.completionTime?.ranked || 0;
+            const completionsRanked = data.statistics?.season?.completions?.ranked || 0;
             const uuid = data.uuid;
 
             let includePlayer = (eloRate !== null && eloRate !== "null" && playedMatchesRanked !== 0);
@@ -578,8 +580,9 @@ async function fetchDataForUUIDs() {
             if (includePlayer) {
                 let nickname = data.nickname;
                 let ffRate = (playedMatchesRanked > 0) ? (forfeitsRanked / playedMatchesRanked) * 100 : 0;
+                let avgTime = (completionsRanked > 0) ? (completionTimeRanked / completionsRanked) : null;
 
-                playerData.push({ uuid, nickname, eloRate, bestTimeRanked, winsRanked, losesRanked, ffRate });
+                playerData.push({ uuid, nickname, eloRate, bestTimeRanked, winsRanked, losesRanked, ffRate, avgTime });
             }
         });
 
@@ -614,6 +617,14 @@ function sortPlayerData() {
             const winB = b.winsRanked + b.losesRanked > 0 ? (b.winsRanked / (b.winsRanked + b.losesRanked)) : 0;
             return winB - winA;
         });
+    } else if (sortT == 4) {
+        // Avg time
+        playerData.sort((a, b) => {
+            if (!a.avgTime && !b.avgTime) return 0;
+            if (!a.avgTime) return 1;
+            if (!b.avgTime) return -1;
+            return a.avgTime - b.avgTime;
+        });
     }
 }
 
@@ -628,14 +639,16 @@ function formatTime(timeInMs) {
 document.addEventListener('DOMContentLoaded', function() {
     const eloHeader = document.querySelector('th:nth-child(3)');
     const bestTimeHeader = document.querySelector('th:nth-child(4)');
-    const winrateHeader = document.querySelector('th:nth-child(5)');
+    const avgTimeHeader = document.querySelector('#avgTimeHeader');
+    const winrateHeader = document.querySelector('#winrateHeader');
 
     const eloArrow = document.getElementById("eloArrow");
     const timeArrow = document.getElementById("timeArrow");
+    const avgArrow = document.getElementById("avgArrow");
     const winArrow = document.getElementById("winArrow");
 
     function resetAllArrows() {
-        [eloArrow, timeArrow, winArrow].forEach(arrow => {
+        [eloArrow, timeArrow, avgArrow, winArrow].forEach(arrow => {
             arrow.classList.remove("arrow-rotated", "arrow-normal");
             arrow.classList.add("arrow-normal");
         });
@@ -660,6 +673,13 @@ document.addEventListener('DOMContentLoaded', function() {
         displayPlayerData();
         activateArrow(timeArrow);
     });
+
+    avgTimeHeader.addEventListener('click', function () {
+            sortT = 4;
+            sortPlayerData();
+            displayPlayerData();
+            activateArrow(avgArrow);
+        });
 
     winrateHeader.addEventListener('click', function () {
         sortT = 3;
@@ -712,16 +732,20 @@ function displayPlayerData() {
         bestTimeCell.textContent = userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-';
         bestTimeCell.style.textAlign = 'center';
 
+        const avgTimeCell = row.insertCell(4);
+        avgTimeCell.textContent = userData.avgTime ? formatTime(userData.avgTime) : '-';
+        avgTimeCell.style.textAlign = 'center';
+
         let winRate = (userData.winsRanked + userData.losesRanked > 0) 
             ? (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 
             : 0;
         let ffRate = userData.ffRate.toFixed(2);
 
-        const winRateCell = row.insertCell(4);
+        const winRateCell = row.insertCell(5);
         winRateCell.textContent = winRate.toFixed(2) + "%";
         winRateCell.style.textAlign = 'center';
 
-        const ffRateCell = row.insertCell(5);
+        const ffRateCell = row.insertCell(6);
         ffRateCell.textContent = `${ffRate}%`;
         ffRateCell.style.textAlign = 'center';
 
@@ -753,14 +777,14 @@ function convertToCSV() {
     const moment = window.moment;
     const timestamp = moment(clickTime).format('YYYY-MM-DD~HH:mm:ss');
 
-    let csv = '#,Nickname,Elo Rate,Best Time,Win Rate,FF Rate\n';
+    let csv = '#,Nickname,Elo Rate,Best Time,Avg Time,Win Rate,FF Rate\n';
 
     playerData.forEach((userData, index) => {
         let winRate = (userData.winsRanked + userData.losesRanked > 0) 
             ? (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 
             : 0;
 
-        csv += `${index + 1},${userData.nickname},${userData.eloRate},${userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-'},${winRate.toFixed(2)}%,${userData.ffRate.toFixed(2)}%\n`;
+        csv += `${index + 1},${userData.nickname},${userData.eloRate},${userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-'},${userData.avgTime ? formatTime(userData.avgTime) : '-'},${winRate.toFixed(2)}%,${userData.ffRate.toFixed(2)}%\n`;
     });
 
     csv += 'Downloaded at ' + timestamp;
@@ -824,7 +848,7 @@ let x = setInterval(function() {
     const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
     const formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
     
-    document.getElementById("time").innerText = "The season will end in " + days + " days " + formattedHours + ":"
+    document.getElementById("time").innerText = "End in " + days + " days " + formattedHours + ":"
     + formattedMinutes + ":" + formattedSeconds;
    
     if (distance < 0) {

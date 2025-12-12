@@ -11,20 +11,19 @@
 
 #rankedTable {
   display: none;
-  width: 65%;
+  width: 100%;
   font-size: 1.2em;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 65%;
   margin: 0 auto;
   text-align: center;
-  border-collapse: collapse;
-  overflow: hidden;
   font-family: 'Mcfont', 'ranked', sans-serif;
 }
 
 td, th {
   padding: 8px;
   text-align: center;
-  /* margin: 100px; */
   position: relative;
 }
 
@@ -39,9 +38,19 @@ td, th {
 }
 
 thead {
-  height: 50px;
   background-color: #102c30;
   color: white;
+  position: sticky; 
+  top: 0;
+  z-index: 20;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background-color: #102c30;
+  z-index: 20;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
 }
 
 th:nth-child(6):hover,
@@ -53,7 +62,14 @@ th:nth-child(1):hover {
 
 th:nth-child(3):hover,
 th:nth-child(4):hover,
-th:nth-child(5):hover{
+th:nth-child(5):hover,
+th:nth-child(6):hover {
+  animation: animation 0.4s;
+  cursor: pointer;
+  background-color: #1f454b;
+}
+
+#avgTimeHeader:hover {
   animation: animation 0.4s;
   cursor: pointer;
   background-color: #1f454b;
@@ -63,8 +79,9 @@ th:nth-child(1), td:nth-child(1) { width: 4%; padding: 0px; }
 th:nth-child(2), td:nth-child(2) { width: 30%; }
 th:nth-child(3), td:nth-child(3) { width: 10%; }
 th:nth-child(4), td:nth-child(4) { width: 15%; }
-th:nth-child(5), td:nth-child(5) { width: 12%; }
+th:nth-child(5), td:nth-child(5) { width: 15%; }
 th:nth-child(6), td:nth-child(6) { width: 11%; }
+th:nth-child(7), td:nth-child(7) { width: 11%; }
 
 td[data-date]::before {
   content: attr(data-date);
