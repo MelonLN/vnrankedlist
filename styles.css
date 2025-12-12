@@ -131,6 +131,8 @@ body{
 
 @font-face {
   font-family: mcfont;
+  ascent-override: 85%;
+  descent-override: 15%;
   src: url(./font/Pixer-Regular.woff2);
 }
   
@@ -270,6 +272,8 @@ h1 {
 
 @font-face {
   font-family: ranked;
+  ascent-override: 85%;
+  descent-override: 15%;
   src: url(./font/Pixelcraft.otf);
 }
 
@@ -667,7 +671,7 @@ input{
     max-width: 100%;
     table-layout: fixed;
     width: 100%;
-    font-size: 0.85em;
+    font-size: 11px;
   }
   #lead{
     margin-left: 0px;
@@ -682,6 +686,9 @@ input{
     margin-top: 5px;
   }
   #nav2{
+  }
+  #time{
+    font-size: 0.9em;
   }
   #tt {
     font-size: 1.8em;
@@ -708,4 +715,8 @@ input{
     padding: 8px;
     text-align: center;
   }
+}
+
+#foot a {
+  color: #87ce34;
 }
