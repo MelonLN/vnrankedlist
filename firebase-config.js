@@ -1,5 +1,6 @@
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app-check.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCV0_aY8FPopcjjV_WH_3Ia2yNdMy1QNtE",
@@ -11,9 +12,16 @@ const firebaseConfig = {
   measurementId: "G-VTTWDF59RX"
 };
 
-  const app = initializeApp(firebaseConfig);
-  window.db = getFirestore(app);
-  window.collection = collection;
-  window.addDoc = addDoc;
-  window.serverTimestamp = serverTimestamp;
-  window.getDocs = getDocs;
+const app = initializeApp(firebaseConfig);
+
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider("6Ld5YSgsAAAAAKHlnPkNoQb5PEVjWPYEh8jyy03I"),
+  isTokenAutoRefreshEnabled: true
+});
+
+// Firestore services
+window.db = getFirestore(app);
+window.collection = collection;
+window.addDoc = addDoc;
+window.serverTimestamp = serverTimestamp;
+window.getDocs = getDocs;
