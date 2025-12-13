@@ -304,10 +304,12 @@ h1 {
 
 .close {
   color: #aaa;
-  float: right;
+  position: absolute;
+  right: 20px;
   font-size: 28px;
   font-weight: bold;
 }
+
 
 .close:hover,
 .close:focus {
@@ -550,12 +552,9 @@ footer{
   display: block;
   position: relative;
   background-color: #102c30;
-  /* transform: translateY(-7%); */
-  /* margin: auto auto; */
   padding: 20px;
   font-size: 20px;
   border: 0px solid #888;
-  width: 550px;
   color: white;
   font-family: 'Mcfont', monospace;
   animation-name: popIn;
@@ -569,6 +568,9 @@ footer{
   font-weight: bold;
   font-family: 'Ranked', monospace;
 }
+
+.iframe-close:hover,
+.iframe-close:focus,
 .close:hover,
 .close:focus {
   color: #aaa;
@@ -582,23 +584,23 @@ footer{
 }
 
 #btsm{
-  /* display: inline-block; */
+  margin-top: 10px;
   margin-right: auto;
   cursor: pointer;
   background-color: #0c2124;
   border: 0px solid #8f2f6400;
-  margin: 5px;
-  transform: translateY(20%);
   color: #fff;
   border-radius: 0px;
   font-size: 20px;
   height: 30px;
   width: 100px;
   text-align: center;
-  font-family:"Mcfont", monospace;
+  font-family: "Mcfont", monospace;
 }
 
 input{
+  height: 26px;
+  width: 250px;
   cursor: pointer;
   background-color: #0c2124;
   border: 0px solid #8f2f6400;
@@ -613,21 +615,17 @@ input{
   cursor: pointer;
   background-color: #0c2124;
   border: 0px solid #8f2f6400;
-  transform: translateY(6px);
-  color: #fff;
-  width: 24px;
-  height: 24px;
-  border-radius: 0px;
-  /* display: flex; */
-  /* justify-content: center;
-  align-items: center; */
-  text-align: center;
-  font-family:"Mcfont", monospace;
-}
-#img3{
-  margin: auto;
   width: 26px;
   height: 26px;
+  border-radius: 0px;
+  background-image: url("https://mcsrrankedtracker.vercel.app/_next/image?url=%2Fimages%2Ficons%2Fsearch.png&w=16&q=75");
+  image-rendering: pixelated;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#img3{
+  margin: auto;;
   image-rendering: pixelated;
 }
 
@@ -719,4 +717,118 @@ input{
 
 #foot a {
   color: #87ce34;
+}
+
+#info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.nameinput{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.emailinput{
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  gap: 2px;
+}
+.inputlabel{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.userprofile{
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+}
+#info{
+  padding: 18px;
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+  background-color: #14373c;
+  box-shadow: #0c2124 4px 4px 0px 0px;
+}
+.profile{
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.proname{
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+#subscribeForm{
+  display: flex;
+  flex-direction: column;
+}
+.proinfo{
+  display: flex;
+  flex-direction: row;
+}
+.proinfo:nth-child(2){
+  font-size: 18px;
+}
+#message{
+  margin-top: 10px;
+  text-align: center;
+}
+
+
+.iframe-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  animation-name: fadeIn;
+  animation-duration: 0.5s;
+}
+
+.iframe-modal-content {
+  width: 90%;
+  max-width: 1100px;
+  height: 85%;
+  background: #111;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  animation-name: popIn;
+  animation-duration: 0.5s;
+}
+
+.iframe-modal iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.iframe-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  font-family: 'Ranked', monospace;
+}
+
+.iframe-exit {
+  animation: fadeOut 0.5s forwards;
+}
+
+.iframe-content-exit {
+  animation: slideOutDown 0.5s forwards;
 }

@@ -286,7 +286,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 async function fetchUUIDs() {
     let uuidsFromGist = [];
-    let uuidsFromFirestore = [];
     let uuidsRankedVN = [];
 
     // GIST
@@ -299,15 +298,7 @@ async function fetchUUIDs() {
         console.error('Error fetching UUIDs from gist:', error);
     }
 
-    // FIRESTORE
-    try {
-        const snapshot = await window.getDocs(window.collection(window.db, "uuids"));
-        uuidsFromFirestore = snapshot.docs.map(doc => doc.data().uuid);
-    } catch (error) {
-        console.error('Error fetching UUIDs from Firestore:', error);
-    }
-
-    // RANKED VN
+    // RANKED
     try {
         const rankedRes = await fetch("https://mcsrranked.com/api/leaderboard?country=vn");
         const rankedData = await rankedRes.json();
@@ -323,7 +314,6 @@ async function fetchUUIDs() {
     const combined = [
         ...new Set([
             ...uuidsFromGist,
-            ...uuidsFromFirestore,
             ...uuidsRankedVN
         ])
     ];
@@ -334,62 +324,85 @@ async function fetchUUIDs() {
 document.getElementById('search').addEventListener('click', fetchDataUser);
 
 const subscribeButton = document.getElementById('btsm');
-subscribeButton.disabled = true;
+subscribeButton.disabled = false;
 subscribeButton.classList.add('off');
 
-subscribeButton.addEventListener('click', async function () {
+subscribeButton.addEventListener('click', async function (event) {
+    event.preventDefault();
+    const emailInput = document.getElementById('Email');
+    const messageEl = document.getElementById('message');
+
+    const lastSent = localStorage.getItem('lastSubscribeTime');
+    if (lastSent) {
+        const now = Date.now();
+        let remaining = COOLDOWN_TIME - (now - Number(lastSent));
+
+        if (remaining > 0) {
+            if (cooldownInterval) clearInterval(cooldownInterval);
+
+            const updateText = () => {
+                if (remaining <= 0) {
+                    clearInterval(cooldownInterval);
+                    cooldownInterval = null;
+                    messageEl.innerText = '';
+                    return;
+                }
+
+                const secondsLeft = Math.ceil(remaining / 1000);
+                const minutes = Math.floor(secondsLeft / 60);
+                const seconds = secondsLeft % 60;
+
+                messageEl.innerText =
+                    `Please wait ${minutes}:${seconds.toString().padStart(2, '0')} before sending again.`;
+                messageEl.style.display = 'block';
+
+                remaining -= 1000;
+            };
+
+            updateText();
+            cooldownInterval = setInterval(updateText, 1000);
+            return;
+        }
+    }
+
+    if (!emailInput.checkValidity()) {
+        emailInput.reportValidity();
+        return;
+    }
+
     if (!window.currentUUID) {
-        document.getElementById('message').innerText = "No UUID to subscribe.";
-        document.getElementById('message').style.display = 'block';
+        messageEl.innerText = "No UUID to subscribe.";
+        messageEl.style.display = 'block';
         return;
     }
 
     try {
-        const response = await fetch('https://gist.githubusercontent.com/babeoban/b7b4db7f956878666740924864fdbb02/raw/663c46d38519d3607e2a9a718de8cd49e1bafd44/uuids.json');
-        const gistUUIDs = await response.json();
+        const response = await fetch("https://script.google.com/macros/s/AKfycbwq2cdsX-V9CLcOLu6B8k2WqXY2c3qw9JBqYbAjX5mI6S04jIy_3bj5zj-bGY022b38/exec", {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain" 
+            },
+            body: JSON.stringify({
+                uuid: window.currentUUID,
+                country: window.currentCountry || "unknown",
+                email: emailInput.value.trim()
+            })
+        }); 
 
-        if (gistUUIDs.includes(window.currentUUID)) {
-            document.getElementById('message').innerText = "This UUID already exists.";
-            document.getElementById('message').style.display = 'block';
-            return;
+        if (!response.ok) {
+            throw new Error("Request failed");
         }
 
-        const docRef = await window.addDoc(
-            window.collection(window.db, "uuids"),
-            {
-                uuid: window.currentUUID,
-                createdAt: window.serverTimestamp()
-            }
-        );
-
-        console.log("UUID saved with ID:", docRef.id);
-        document.getElementById('message').innerText = "Subscribed!";
-        document.getElementById('message').style.display = 'block';
+        messageEl.innerText = "Your request has been sent!";
+        messageEl.style.display = 'block';
+        localStorage.setItem('lastSubscribeTime', Date.now());
 
     } catch (error) {
         console.error("Error subscribing:", error);
-        document.getElementById('message').innerText = "Failed to subscribe.";
-        document.getElementById('message').style.display = 'block';
+        messageEl.innerText = "Failed to send your request. Please try again later.";
+        messageEl.style.display = 'block';
     }
 });
-
-
-async function saveUUIDToFirestore(uuid) {
-  try {
-    const docRef = await window.addDoc(
-      window.collection(window.db, "uuids"),
-      {
-        uuid: uuid,
-        createdAt: window.serverTimestamp()
-      }
-    );
-    console.log("UUID written with ID:", docRef.id);
-    return true;
-  } catch (err) {
-    console.error("Error adding UUID to Firestore:", err);
-    return false;
-  }
-}
 
 
 async function fetchDataUser(event) {
@@ -424,20 +437,8 @@ async function fetchDataUser(event) {
 
         displayPlayerDataS(playerData);
 
-        if (!country || String(country).toLowerCase() !== "vn") {
-            document.getElementById('message').innerHTML =
-              `Sorry, your account does not meet the requirements to subscribe to this leaderboard. Please try again or contact a moderator for assistance. (Detected country: ${country || 'unknown'})`;
-            subscribeButton.disabled = true;
-            subscribeButton.classList.add('off');
-            console.log('Subscription blocked — country:', country);
-            document.getElementById('message').style.display = 'block'
-            return;
-        }  else {
-            subscribeButton.disabled = false;
-            subscribeButton.classList.remove('off');
-            document.getElementById('message').style.display = 'none'
-        }
         window.currentUUID = uuid;
+        window.currentCountry = country;
  
     } catch (error) {
         document.getElementById('info').innerHTML = `This name was not found, please try again!`;
@@ -450,53 +451,70 @@ async function fetchDataUser(event) {
 
 function displayPlayerDataS(playerData) {
     const info = document.getElementById('info');
-    subscribeButton.classList.remove('off');
     info.innerHTML = '';
+    subscribeButton.classList.remove('off');
 
-    playerData.forEach((userDataS) => {
-        const profilePic = document.createElement('img');
-        profilePic.src = `https://mc-heads.net/avatar/${userDataS.uuid}`;
-        profilePic.width = 32;
-        profilePic.height = 32;
-        profilePic.alt = 'Profile Picture';
-        profilePic.style.marginRight = '4px';
+    playerData.forEach((user) => {
 
-        const playerName = document.createElement('span');
-        playerName.textContent = userDataS.nickname;
+        const avatar = document.createElement('img');
+        avatar.src = `https://mc-heads.net/avatar/${user.uuid}`;
+        avatar.width = 40;
+        avatar.height = 40;
+        avatar.alt = 'Profile Picture';
 
-        const rank = document.createElement('div');
-        if (userDataS.eloRate >= 2000) {
-            rank.style.color = 'purple';
-            rank.textContent = "NETHERITE";
-        } else if (userDataS.eloRate >= 1500 && userDataS.eloRate <= 1999) {
-            rank.style.color = 'cyan';
-            rank.textContent = "DIAMOND";
-        } else if (userDataS.eloRate >= 1200 && userDataS.eloRate <= 1499) {
-            rank.style.color = 'lime';
-            rank.textContent = "EMERALD";
-        } else if (userDataS.eloRate >= 900 && userDataS.eloRate <= 1199) {
-            rank.style.color = 'gold';
-            rank.textContent = "GOLD";
-        } else if (userDataS.eloRate >= 600 && userDataS.eloRate <= 899) {
-            rank.style.color = 'silver';
-            rank.textContent = "IRON";
-        } else {
-            rank.style.color = 'black';
-            rank.textContent = "COAL";
-        }
+        const profile = document.createElement('div');
+        profile.className = 'profile';
+
+        const proinfoTop = document.createElement('div');
+        proinfoTop.className = 'proinfo';
+
+        const name = document.createElement('div');
+        name.style.fontFamily = "ranked, monospace";
+        name.textContent = user.nickname + "| ";
 
         const ladder = document.createElement('div');
-        ladder.textContent = "Ladder Rank " + userDataS.eloRank;
+        ladder.style.fontSize = "18px";
+        ladder.textContent = `#${user.eloRank}`;
+
+        proinfoTop.appendChild(name);
+        proinfoTop.appendChild(ladder);
+
+        const proinfoBottom = document.createElement('div');
+        proinfoBottom.className = 'proinfo';
+
+        const rank = document.createElement('div');
+
+        if (user.eloRate >= 2000) {
+            rank.style.color = 'purple';
+            rank.textContent = 'NETHERITE';
+        } else if (user.eloRate >= 1500) {
+            rank.style.color = 'cyan';
+            rank.textContent = 'DIAMOND';
+        } else if (user.eloRate >= 1200) {
+            rank.style.color = 'lime';
+            rank.textContent = 'EMERALD';
+        } else if (user.eloRate >= 900) {
+            rank.style.color = 'gold';
+            rank.textContent = 'GOLD';
+        } else if (user.eloRate >= 600) {
+            rank.style.color = 'silver';
+            rank.textContent = 'IRON';
+        } else {
+            rank.style.color = 'black';
+            rank.textContent = 'COAL';
+        }
 
         const elo = document.createElement('div');
-        elo.textContent = "Elo " + userDataS.eloRate;
+        elo.innerHTML = `&nbsp;(${user.eloRate} Elo)`;
 
-        info.appendChild(profilePic);
-        info.appendChild(playerName);
-        info.appendChild(rank);
-        info.appendChild(ladder);
-        info.appendChild(elo);
+        proinfoBottom.appendChild(rank);
+        proinfoBottom.appendChild(elo);
 
+        profile.appendChild(proinfoTop);
+        profile.appendChild(proinfoBottom);
+
+        info.appendChild(avatar);
+        info.appendChild(profile);
     });
 }
 
@@ -691,9 +709,49 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchDataForUUIDs();
 });
 
-// setInterval(function() {
-//     fetchDataForUUIDs();
-// }, 180000);
+const profileModal = document.getElementById('profileModal');
+const profileIframe = document.getElementById('profileIframe');
+const profileCloseBtn = document.querySelector('.iframe-close');
+
+function openProfilePopup(nickname) {
+    if (!nickname) return;
+
+    profileIframe.src = `https://mcsrranked.com/stats/${nickname}`;
+
+    profileModal.classList.remove('iframe-exit');
+    profileModal.style.display = 'flex';
+
+    const content = profileModal.querySelector('.iframe-modal-content');
+    content.classList.remove('iframe-content-exit');
+}
+
+function closeProfilePopup() {
+    const content = profileModal.querySelector('.iframe-modal-content');
+
+    profileModal.classList.add('iframe-exit');
+    content.classList.add('iframe-content-exit');
+
+    setTimeout(() => {
+        profileIframe.src = '';
+        profileModal.style.display = 'none';
+
+        profileModal.classList.remove('iframe-exit');
+        content.classList.remove('iframe-content-exit');
+    }, 500);
+}
+
+if (profileCloseBtn) {
+    profileCloseBtn.addEventListener('click', closeProfilePopup);
+}
+
+if (profileModal) {
+    profileModal.addEventListener('click', function (e) {
+        if (e.target === profileModal) {
+            closeProfilePopup();
+        }
+    });
+}
+
 
 function displayPlayerData() {
     const rankedBody = document.getElementById('rankedBody');
@@ -764,8 +822,7 @@ function displayPlayerData() {
         }
 
         row.addEventListener('click', function () {
-            const profileUrl = `https://mcsrranked.com/stats/${userData.uuid}`;
-            window.open(profileUrl, '_blank');
+            openProfilePopup(userData.nickname);
         });
 
         row.classList.add('player-row');
@@ -888,6 +945,39 @@ window.onclick = function(event) {
   }
 }
 
-document.getElementById('userForm').addEventListener('submit', function(event) {
-  event.preventDefault();
-});
+let cooldownInterval = null;
+const COOLDOWN_TIME = 5 * 60 * 1000;
+
+var esteregg = document.getElementById("big");
+var clickCount = 0;
+
+esteregg.onclick = async function() {
+    clickCount++;
+    if (clickCount < 20) return;
+
+    clickCount = 0;
+
+    try {
+        const res = await fetch("https://icanhazdadjoke.com/", {
+            headers: {
+                "Accept": "application/json",
+                "User-Agent": "MyApp (https://example.com)"
+            }
+        });
+        const data = await res.json();
+        const message = data.joke;
+
+        await fetch("https://script.google.com/macros/s/AKfycbyyYq4rynVDQBVUIfYl3caCWHzi8dSut1wvAE9J1pX_7RfJerzIFtBkeSMTZFILOy41Wg/exec", {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+
+
+
