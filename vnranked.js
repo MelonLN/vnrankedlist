@@ -1007,7 +1007,7 @@ esteregg.onclick = async function() {
         const data = await res.json();
         const message = data.joke;
 
-        await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+        await fetch("https://script.google.com/macros/s/AKfycbyMmHuGl-0UXteK_fK8G6YjAzQfc5weyAkI3EMjq_SXz5qE6iK1IrPCs_D-otlet2NnDQ/exec", {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/json" },
