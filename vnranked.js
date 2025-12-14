@@ -284,6 +284,8 @@ document.addEventListener('DOMContentLoaded', function () {
     requestAnimationFrame(animate);
 });
 
+let combinedUUIDs = new Set();
+
 async function fetchUUIDs() {
     let uuidsFromGist = [];
     let uuidsRankedVN = [];
@@ -291,7 +293,7 @@ async function fetchUUIDs() {
     // GIST
     try {
         const response = await fetch(
-          'https://gist.githubusercontent.com/babeoban/b7b4db7f956878666740924864fdbb02/raw/663c46d38519d3607e2a9a718de8cd49e1bafd44/uuids.json'
+          'https://gist.githubusercontent.com/MelonLN/f5edd47f1f35d448c05066d8b95ce924/raw/fb01ca4bc13b0bb29d2f8ffbb246fe848ded18e3/uuids.json'
         );
         uuidsFromGist = await response.json();
     } catch (error) {
@@ -317,6 +319,8 @@ async function fetchUUIDs() {
             ...uuidsRankedVN
         ])
     ];
+
+    combinedUUIDs = new Set(combined);
 
     return combined;
 }
@@ -376,8 +380,15 @@ subscribeButton.addEventListener('click', async function (event) {
         return;
     }
 
+    if (combinedUUIDs.has(window.currentUUID)) {
+        messageEl.innerText = "This player is already subscribed.";
+        messageEl.style.display = 'block';
+        return;
+    }
+
+
     try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbwq2cdsX-V9CLcOLu6B8k2WqXY2c3qw9JBqYbAjX5mI6S04jIy_3bj5zj-bGY022b38/exec", {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyKP-dBiOrhKmG4HhWSRGO0Q2sICAoYZHfgOvYbCUjA0YHkML0GzqQWMMwIPk6xJ7do/exec", {
             method: "POST",
             headers: {
                 "Content-Type": "text/plain" 
@@ -712,6 +723,8 @@ document.addEventListener('DOMContentLoaded', function() {
 const profileModal = document.getElementById('profileModal');
 const profileIframe = document.getElementById('profileIframe');
 const profileCloseBtn = document.querySelector('.iframe-close');
+const closemodal = document.getElementById('close-modal');
+
 
 function openProfilePopup(nickname) {
     if (!nickname) return;
@@ -723,6 +736,7 @@ function openProfilePopup(nickname) {
 
     const content = profileModal.querySelector('.iframe-modal-content');
     content.classList.remove('iframe-content-exit');
+    closemodal.classList.remove('close-exit');
 }
 
 function closeProfilePopup() {
@@ -730,6 +744,7 @@ function closeProfilePopup() {
 
     profileModal.classList.add('iframe-exit');
     content.classList.add('iframe-content-exit');
+    closemodal.classList.add('close-exit');
 
     setTimeout(() => {
         profileIframe.src = '';
@@ -737,6 +752,7 @@ function closeProfilePopup() {
 
         profileModal.classList.remove('iframe-exit');
         content.classList.remove('iframe-content-exit');
+        closemodal.classList.remove('close-exit');
     }, 500);
 }
 
@@ -951,6 +967,28 @@ const COOLDOWN_TIME = 5 * 60 * 1000;
 var esteregg = document.getElementById("big");
 var clickCount = 0;
 
+function playTing() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const osc1 = audioCtx.createOscillator();
+    const gain1 = audioCtx.createGain();
+    osc1.connect(gain1).connect(audioCtx.destination);
+    osc1.frequency.value = 1000; 
+    gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
+
+    osc1.start(audioCtx.currentTime);
+    osc1.stop(audioCtx.currentTime + 0.1); 
+
+    const osc2 = audioCtx.createOscillator();
+    const gain2 = audioCtx.createGain();
+    osc2.connect(gain2).connect(audioCtx.destination);
+    osc2.frequency.value = 1200; 
+    gain2.gain.setValueAtTime(0.3, audioCtx.currentTime + 0.12);
+
+    osc2.start(audioCtx.currentTime + 0.12);
+    osc2.stop(audioCtx.currentTime + 0.22);
+}
+
 esteregg.onclick = async function() {
     clickCount++;
     if (clickCount < 20) return;
@@ -958,6 +996,8 @@ esteregg.onclick = async function() {
     clickCount = 0;
 
     try {
+        playTing(); 
+
         const res = await fetch("https://icanhazdadjoke.com/", {
             headers: {
                 "Accept": "application/json",
@@ -967,7 +1007,7 @@ esteregg.onclick = async function() {
         const data = await res.json();
         const message = data.joke;
 
-        await fetch("https://script.google.com/macros/s/AKfycbyyYq4rynVDQBVUIfYl3caCWHzi8dSut1wvAE9J1pX_7RfJerzIFtBkeSMTZFILOy41Wg/exec", {
+        await fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
             method: "POST",
             mode: "no-cors",
             headers: { "Content-Type": "application/json" },
@@ -977,6 +1017,7 @@ esteregg.onclick = async function() {
         console.error(err);
     }
 };
+
 
 
 
