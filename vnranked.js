@@ -293,7 +293,7 @@ async function fetchUUIDs() {
     // GIST
     try {
         const response = await fetch(
-          'https://gist.githubusercontent.com/MelonLN/f5edd47f1f35d448c05066d8b95ce924/raw/fb01ca4bc13b0bb29d2f8ffbb246fe848ded18e3/uuids.json'
+          'https://gist.githubusercontent.com/MelonLN/f5edd47f1f35d448c05066d8b95ce924/raw/uuids.json'
         );
         uuidsFromGist = await response.json();
     } catch (error) {
