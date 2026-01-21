@@ -1018,7 +1018,39 @@ esteregg.onclick = async function() {
     }
 };
 
+const modalSidebar = document.getElementById('profileModal');
+const dragHandle = document.getElementById('resizer');
 
+if (dragHandle && modalSidebar) {
+    dragHandle.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        
+        modalSidebar.style.animation = 'none';
+        modalSidebar.style.transition = 'none';
+        
+        const closemodal = document.getElementById('close-modal');
+        if (closemodal) {
+            closemodal.style.animation = 'none';
+        }
+        
+        document.body.classList.add('resizing-active');
+        window.addEventListener('mousemove', resizeSidebar);
+        window.addEventListener('mouseup', stopResizingSidebar);
+    });
 
+    function resizeSidebar(e) {
+        let newWidth = window.innerWidth - e.clientX;
 
+        if (newWidth > 200 && newWidth < window.innerWidth * 0.8) {
+            modalSidebar.style.width = newWidth + 'px';
+            // Lưu lại chiều rộng hiện tại vào biến CSS để animation đóng (scaleOut) mượt hơn
+            modalSidebar.style.setProperty('--sidebar-width', newWidth + 'px');
+        }
+    }
 
+    function stopResizingSidebar() {
+        document.body.classList.remove('resizing-active');
+        window.removeEventListener('mousemove', resizeSidebar);
+        window.removeEventListener('mouseup', stopResizingSidebar);
+    }
+}
