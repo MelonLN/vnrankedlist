@@ -663,6 +663,34 @@ input{
   animation: fadeOut 0.5s;
 }
 
+#tt {
+  font-size: 2em;
+  display: block;
+  text-align: center;
+  color: #fff;
+  font-family: "Mcfont", monospace;
+}
+
+#seasonSelect {
+  background-color: #0c2124;
+  color: #fff;
+  border: none;
+  font-family: 'Mcfont', monospace;
+  font-size: 1.5em;
+  cursor: pointer;
+  margin-left: 5px;
+  padding: 0 5px;
+  outline: none;
+}
+
+#seasonSelect:hover {
+  background-color: #1f454b;
+}
+
+.season-header {
+  display: flex;
+  align-items: center;
+}
 
 @media (max-width: 768px) 
 {

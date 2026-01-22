@@ -6,6 +6,13 @@ let outerRing = null;
 let innerRing = null;
 let isDataLoaded = false; 
 
+// Cache to store player data for each season
+const seasonCache = {};
+
+// Parse season from URL
+const urlParams = new URLSearchParams(window.location.search);
+let activeSeason = urlParams.get('season');
+
 function showLoading() {
     const loadingScreen = document.getElementById('loading-contai');
     const table = document.getElementById('rankedTable');
@@ -22,6 +29,8 @@ function showLoading() {
             t.style.color = 'white';
             loadingScreenEl.appendChild(t);
         }
+    } else {
+        document.getElementById('loading-progress-text').textContent = '';
     }
 }
 
@@ -286,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 let combinedUUIDs = new Set();
 
-async function fetchUUIDs() {
+async function fetchUUIDs(season) {
     let uuidsFromGist = [];
     let uuidsRankedVN = [];
 
@@ -302,7 +311,11 @@ async function fetchUUIDs() {
 
     // RANKED
     try {
-        const rankedRes = await fetch("https://mcsrranked.com/api/leaderboard?country=vn");
+        const leaderboardUrl = season 
+            ? `https://mcsrranked.com/api/leaderboard?country=vn&season=${season}`
+            : "https://mcsrranked.com/api/leaderboard?country=vn";
+            
+        const rankedRes = await fetch(leaderboardUrl);
         const rankedData = await rankedRes.json();
 
         if (rankedData?.data?.users) {
@@ -418,7 +431,7 @@ subscribeButton.addEventListener('click', async function (event) {
 
 async function fetchDataUser(event) {
     event.preventDefault();
-    const playerData = [];
+    const results = [];
     const userinGameName = document.getElementById('InGameName').value.trim();
     
     if (!userinGameName) {
@@ -429,8 +442,11 @@ async function fetchDataUser(event) {
     }
     
     try {
-        const apiUrlS = `https://mcsrranked.com/api/users/${encodeURIComponent(userinGameName)}`;
-        const userDataResponseS = await fetch(apiUrlS);
+        const userApiUrl = activeSeason 
+            ? `https://mcsrranked.com/api/users/${encodeURIComponent(userinGameName)}?season=${activeSeason}`
+            : `https://mcsrranked.com/api/users/${encodeURIComponent(userinGameName)}`;
+
+        const userDataResponseS = await fetch(userApiUrl);
         if (!userDataResponseS.ok) {
             throw new Error('Network response was not ok');
         }
@@ -440,13 +456,20 @@ async function fetchDataUser(event) {
             throw new Error('No user data returned');
         }
 
-        const { nickname, eloRate, eloRank, uuid, country } = userDataS.data;
+        const data = userDataS.data;
+        let { nickname, eloRate, eloRank, uuid, country } = data;
 
-        if (eloRate !== null && eloRank !== null) {
-            playerData.push({ nickname, eloRate, eloRank, uuid, country });
+        // If viewing past season, check seasonResult for accurate data
+        if (activeSeason && data.seasonResult && data.seasonResult.last) {
+            eloRate = data.seasonResult.last.eloRate || eloRate;
+            eloRank = data.seasonResult.last.eloRank || eloRank;
         }
 
-        displayPlayerDataS(playerData);
+        if (eloRate !== null && eloRank !== null) {
+            results.push({ nickname, eloRate, eloRank, uuid, country });
+        }
+
+        displayPlayerDataS(results);
 
         window.currentUUID = uuid;
         window.currentCountry = country;
@@ -460,12 +483,12 @@ async function fetchDataUser(event) {
 }
 
 
-function displayPlayerDataS(playerData) {
+function displayPlayerDataS(data) {
     const info = document.getElementById('info');
     info.innerHTML = '';
     subscribeButton.classList.remove('off');
 
-    playerData.forEach((user) => {
+    data.forEach((user) => {
 
         const avatar = document.createElement('img');
         avatar.src = `https://mc-heads.net/avatar/${user.uuid}`;
@@ -529,12 +552,25 @@ function displayPlayerDataS(playerData) {
     });
 }
 
-async function fetchDataForUUIDs() {
+async function fetchDataForUUIDs(season) {
+    const cacheKey = season || 'current';
+    
+    // Check if data is already in cache
+    if (seasonCache[cacheKey]) {
+        console.log(`[Cache] Loading data for season: ${cacheKey}`);
+        playerData = seasonCache[cacheKey];
+        sortPlayerData();
+        displayPlayerData();
+        hideLoading();
+        updateSeasonUI(season);
+        return;
+    }
+
     playerData = [];
     console.log('[fetchDataForUUIDs] start');
 
     try {
-        const uuids = await fetchUUIDs();
+        const uuids = await fetchUUIDs(season);
         if (!Array.isArray(uuids)) {
             console.error('[fetchDataForUUIDs] fetchUUIDs did not return an array', uuids);
             return;
@@ -548,6 +584,11 @@ async function fetchDataForUUIDs() {
             return;
         }
 
+        // Reset rings for new load
+        isDataLoaded = false;
+        if (outerRing) outerRing.allowedRadius = -1;
+        if (innerRing) innerRing.allowedRadius = -1;
+        
         showLoading();
 
         let loadedCount = 0;
@@ -561,7 +602,10 @@ async function fetchDataForUUIDs() {
 
             const promises = batch.map(async (uuid) => {
                 try {
-                    const apiUrl = `https://mcsrranked.com/api/users/${uuid}`;
+                    const apiUrl = season
+                        ? `https://mcsrranked.com/api/users/${uuid}?season=${season}`
+                        : `https://mcsrranked.com/api/users/${uuid}`;
+                        
                     const userDataResponse = await fetch(apiUrl);
                     if (!userDataResponse.ok) {
                         console.warn(`[fetchDataForUUIDs] non-OK response ${userDataResponse.status} for uuid ${uuid}`);
@@ -595,13 +639,19 @@ async function fetchDataForUUIDs() {
 
             const data = userData.data;
             let eloRate = data.eloRate;
-            let bestTimeRanked = data.statistics?.season?.bestTime?.ranked;
-            const winsRanked = data.statistics?.season?.wins?.ranked || 0;
-            const losesRanked = data.statistics?.season?.loses?.ranked || 0;
-            const forfeitsRanked = data.statistics?.season?.forfeits?.ranked || 0;
-            const playedMatchesRanked = data.statistics?.season?.playedMatches?.ranked || 0;
-            const completionTimeRanked = data.statistics?.season?.completionTime?.ranked || 0;
-            const completionsRanked = data.statistics?.season?.completions?.ranked || 0;
+            
+            if (season && data.seasonResult && data.seasonResult.last) {
+                eloRate = data.seasonResult.last.eloRate || eloRate;
+            }
+
+            const seasonStats = data.statistics?.season;
+            let bestTimeRanked = seasonStats?.bestTime?.ranked;
+            const winsRanked = seasonStats?.wins?.ranked || 0;
+            const losesRanked = seasonStats?.loses?.ranked || 0;
+            const forfeitsRanked = seasonStats?.forfeits?.ranked || 0;
+            const playedMatchesRanked = seasonStats?.playedMatches?.ranked || 0;
+            const completionTimeRanked = seasonStats?.completionTime?.ranked || 0;
+            const completionsRanked = seasonStats?.completions?.ranked || 0;
             const uuid = data.uuid;
 
             let includePlayer = (eloRate !== null && eloRate !== "null" && playedMatchesRanked !== 0);
@@ -615,8 +665,12 @@ async function fetchDataForUUIDs() {
             }
         });
 
+        // Store result in cache
+        seasonCache[cacheKey] = [...playerData];
+
         sortPlayerData();
         displayPlayerData();
+        updateSeasonUI(season);
 
     } catch (error) {
         console.error('[fetchDataForUUIDs] Error fetching UUID list:', error);
@@ -625,14 +679,32 @@ async function fetchDataForUUIDs() {
     }
 }
 
+function updateSeasonUI(season) {
+    const leaderboardApiUrl = season 
+        ? `https://mcsrranked.com/api/leaderboard?season=${season}`
+        : 'https://mcsrranked.com/api/leaderboard';
 
+    fetch(leaderboardApiUrl)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === "success") {
+          const seasonNumber = data.data.season.number;
+          document.getElementById("tt").textContent = `Season `;
+          
+          if (data.data.season.endsAt && !season) {
+            countDownDate = new Date(data.data.season.endsAt * 1000);
+          } else if (season) {
+            countDownDate = null;
+            document.getElementById("time").innerText = "Season Ended";
+          }
+        }
+      });
+}
 
 function sortPlayerData() {
     if (sortT == 1) {
-        // Elo
         playerData.sort((a, b) => b.eloRate - a.eloRate);
     } else if (sortT == 2) {
-        // Best time
         playerData.sort((a, b) => {
             if (!a.bestTimeRanked && !b.bestTimeRanked) return 0;
             if (!a.bestTimeRanked) return 1;
@@ -640,14 +712,12 @@ function sortPlayerData() {
             return a.bestTimeRanked - b.bestTimeRanked;
         });
     } else if (sortT == 3) {
-        // Winrate
         playerData.sort((a, b) => {
             const winA = a.winsRanked + a.losesRanked > 0 ? (a.winsRanked / (a.winsRanked + a.losesRanked)) : 0;
             const winB = b.winsRanked + b.losesRanked > 0 ? (b.winsRanked / (b.winsRanked + b.losesRanked)) : 0;
             return winB - winA;
         });
     } else if (sortT == 4) {
-        // Avg time
         playerData.sort((a, b) => {
             if (!a.avgTime && !b.avgTime) return 0;
             if (!a.avgTime) return 1;
@@ -717,7 +787,7 @@ document.addEventListener('DOMContentLoaded', function() {
         activateArrow(winArrow);
     });
 
-    fetchDataForUUIDs();
+    fetchDataForUUIDs(activeSeason);
 });
 
 const profileModal = document.getElementById('profileModal');
@@ -728,8 +798,12 @@ const closemodal = document.getElementById('close-modal');
 
 function openProfilePopup(nickname) {
     if (!nickname) return;
+    
+    const statsUrl = activeSeason 
+        ? `https://mcsrranked.com/stats/${nickname}?season=${activeSeason}`
+        : `https://mcsrranked.com/stats/${nickname}`;
 
-    profileIframe.src = `https://mcsrranked.com/stats/${nickname}`;
+    profileIframe.src = statsUrl;
 
     profileModal.classList.remove('iframe-exit');
     profileModal.style.display = 'flex';
@@ -890,22 +964,68 @@ document.getElementById('downloadButton').addEventListener('click', downloadCSV)
 
 let countDownDate;
 
+// Initial season setup and building the selector
 fetch('https://mcsrranked.com/api/leaderboard')
   .then(response => response.json())
-  .then(data => {
-    if (data.status === "success") {
-      const seasonNumber = data.data.season.number;
-     
-      document.getElementById("tt").textContent = `Season ${seasonNumber}`;
-     
-      countDownDate = new Date(data.data.season.endsAt * 1000);
-    } else {
-      console.error("Error fetching data from API:", data.message);
+  .then(currentData => {
+    if (currentData.status === "success") {
+      const latestSeason = currentData.data.season.number;
+      const seasonSelect = document.getElementById('seasonSelect');
+      
+      if (seasonSelect) {
+        seasonSelect.innerHTML = '';
+        for (let i = latestSeason; i >= 1; i--) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i;
+          if (activeSeason) {
+            if (i == activeSeason) option.selected = true;
+          } else if (i == latestSeason) {
+            option.selected = true;
+          }
+          seasonSelect.appendChild(option);
+        }
+
+        seasonSelect.addEventListener('change', function() {
+          const newSeason = this.value;
+          const url = new URL(window.location.href);
+          
+          if (newSeason == latestSeason) {
+            url.searchParams.delete('season');
+            activeSeason = null;
+          } else {
+            url.searchParams.set('season', newSeason);
+            activeSeason = newSeason;
+          }
+          
+          // Use history API instead of full reload
+          history.pushState({}, '', url);
+          
+          // Trigger the data load
+          fetchDataForUUIDs(activeSeason);
+        });
+      }
     }
-    let x = setInterval(function() {
-    }, 1000);
   })
-.catch(error => console.error("Error fetching data:", error));
+  .catch(error => console.error("Error initializing season data:", error));
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    activeSeason = urlParams.get('season');
+    
+    // Sync the selector UI
+    const seasonSelect = document.getElementById('seasonSelect');
+    if (seasonSelect) {
+        if (!activeSeason) {
+            seasonSelect.selectedIndex = 0; // Assuming first is latest
+        } else {
+            seasonSelect.value = activeSeason;
+        }
+    }
+    
+    fetchDataForUUIDs(activeSeason);
+});
 
 let x = setInterval(function() {
     if (!countDownDate) return; 
@@ -926,7 +1046,7 @@ let x = setInterval(function() {
    
     if (distance < 0) {
         clearInterval(x);
-        document.getElementById("time").innerText = "Season 4 is over";
+        document.getElementById("time").innerText = "Season Ended";
     }
 }, 1000);
 
@@ -935,18 +1055,22 @@ var modal2 = document.getElementById('myModal-content');
 var btn = document.getElementById("Sub");
 var span = document.getElementsByClassName("close")[0]; 
 
-btn.onclick = function() {
-  modal.style.display = "flex";
+if(btn) {
+    btn.onclick = function() {
+        modal.style.display = "flex";
+    }
 }
 
-span.onclick = function() {
-  modal.classList.add('modal-exit2');
-  modal2.classList.add('modal-exit');
-  setTimeout(function() {
-    modal.style.display = 'none';
-    modal.classList.remove('modal-exit2');
-    modal2.classList.remove('modal-exit');
-  }, 500); 
+if(span) {
+    span.onclick = function() {
+        modal.classList.add('modal-exit2');
+        modal2.classList.add('modal-exit');
+        setTimeout(function() {
+            modal.style.display = 'none';
+            modal.classList.remove('modal-exit2');
+            modal2.classList.remove('modal-exit');
+        }, 500); 
+    }
 }
 
 window.onclick = function(event) {
@@ -989,34 +1113,36 @@ function playTing() {
     osc2.stop(audioCtx.currentTime + 0.22);
 }
 
-esteregg.onclick = async function() {
-    clickCount++;
-    if (clickCount < 20) return;
+if(esteregg) {
+    esteregg.onclick = async function() {
+        clickCount++;
+        if (clickCount < 20) return;
 
-    clickCount = 0;
+        clickCount = 0;
 
-    try {
-        playTing(); 
+        try {
+            playTing(); 
 
-        const res = await fetch("https://icanhazdadjoke.com/", {
-            headers: {
-                "Accept": "application/json",
-                "User-Agent": "MyApp (https://example.com)"
-            }
-        });
-        const data = await res.json();
-        const message = data.joke;
+            const res = await fetch("https://icanhazdadjoke.com/", {
+                headers: {
+                    "Accept": "application/json",
+                    "User-Agent": "MyApp (https://example.com)"
+                }
+            });
+            const data = await res.json();
+            const message = data.joke;
 
-        await fetch("https://script.google.com/macros/s/AKfycbyMmHuGl-0UXteK_fK8G6YjAzQfc5weyAkI3EMjq_SXz5qE6iK1IrPCs_D-otlet2NnDQ/exec", {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
-        });
-    } catch (err) {
-        console.error(err);
-    }
-};
+            await fetch("https://script.google.com/macros/s/AKfycbyMmHuGl-0UXteK_fK8G6YjAzQfc5weyAkI3EMjq_SXz5qE6iK1IrPCs_D-otlet2NnDQ/exec", {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message })
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    };
+}
 
 const modalSidebar = document.getElementById('profileModal');
 const dragHandle = document.getElementById('resizer');
@@ -1043,7 +1169,6 @@ if (dragHandle && modalSidebar) {
 
         if (newWidth > 200 && newWidth < window.innerWidth * 0.8) {
             modalSidebar.style.width = newWidth + 'px';
-            // Lưu lại chiều rộng hiện tại vào biến CSS để animation đóng (scaleOut) mượt hơn
             modalSidebar.style.setProperty('--sidebar-width', newWidth + 'px');
         }
     }
