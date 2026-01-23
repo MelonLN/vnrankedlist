@@ -302,7 +302,7 @@ async function fetchUUIDs(season) {
     // GIST
     try {
         const response = await fetch(
-          'https://gist.githubusercontent.com/MelonLN/f5edd47f1f35d448c05066d8b95ce924/raw/uuids.json'
+          './uuids.json'
         );
         uuidsFromGist = await response.json();
     } catch (error) {
@@ -1151,14 +1151,6 @@ if (dragHandle && modalSidebar) {
     dragHandle.addEventListener('mousedown', function(e) {
         e.preventDefault();
         
-        modalSidebar.style.animation = 'none';
-        modalSidebar.style.transition = 'none';
-        
-        const closemodal = document.getElementById('close-modal');
-        if (closemodal) {
-            closemodal.style.animation = 'none';
-        }
-        
         document.body.classList.add('resizing-active');
         window.addEventListener('mousemove', resizeSidebar);
         window.addEventListener('mouseup', stopResizingSidebar);
@@ -1168,7 +1160,6 @@ if (dragHandle && modalSidebar) {
         let newWidth = window.innerWidth - e.clientX;
 
         if (newWidth > 200 && newWidth < window.innerWidth * 0.8) {
-            modalSidebar.style.width = newWidth + 'px';
             modalSidebar.style.setProperty('--sidebar-width', newWidth + 'px');
         }
     }
