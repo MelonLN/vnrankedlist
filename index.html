@@ -36,7 +36,16 @@
         <div class="mode">
             <div class="season-header">
                 <span id="tt">Season </span>
-                <select id="seasonSelect"></select>
+                <div class="pixel-select" id="seasonSelectUI">
+                    <button type="button" class="pixel-select__btn" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="pixel-select__value">—</span>
+                        <span class="pixel-select__arrow" aria-hidden="true"></span>
+                    </button>
+
+                    <ul class="pixel-select__list" role="listbox"></ul>
+
+                    <select id="seasonSelect" class="pixel-select__native"></select>
+                </div>
             </div>
             <div class="button-container">
                 <button id="Sub">Subscribe</button>

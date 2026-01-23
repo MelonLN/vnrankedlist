@@ -6,7 +6,6 @@ let outerRing = null;
 let innerRing = null;
 let isDataLoaded = false; 
 
-// Cache to store player data for each season
 const seasonCache = {};
 
 // Parse season from URL
@@ -289,6 +288,12 @@ document.addEventListener('DOMContentLoaded', function () {
         innerRing = generateRing(0.5, radius - 1, 80, innerLoader);
     }
 
+    window.resetLoadingRings = function () {
+        init();
+        const txt = document.getElementById('loading-progress-text');
+        if (txt) txt.textContent = '';
+    };
+
     init();
     requestAnimationFrame(animate);
 });
@@ -299,14 +304,14 @@ async function fetchUUIDs(season) {
     let uuidsFromGist = [];
     let uuidsRankedVN = [];
 
-    // GIST
+    // local
     try {
         const response = await fetch(
           './uuids.json'
         );
         uuidsFromGist = await response.json();
     } catch (error) {
-        console.error('Error fetching UUIDs from gist:', error);
+        console.error('Error fetching UUIDs from local file:', error);
     }
 
     // RANKED
@@ -555,7 +560,6 @@ function displayPlayerDataS(data) {
 async function fetchDataForUUIDs(season) {
     const cacheKey = season || 'current';
     
-    // Check if data is already in cache
     if (seasonCache[cacheKey]) {
         console.log(`[Cache] Loading data for season: ${cacheKey}`);
         playerData = seasonCache[cacheKey];
@@ -584,11 +588,34 @@ async function fetchDataForUUIDs(season) {
             return;
         }
 
-        // Reset rings for new load
         isDataLoaded = false;
-        if (outerRing) outerRing.allowedRadius = -1;
-        if (innerRing) innerRing.allowedRadius = -1;
-        
+
+        if (typeof window.resetLoadingRings === 'function') {
+            window.resetLoadingRings();
+        } else {
+            if (outerRing) {
+                outerRing.radius = -1;
+                outerRing.allowedRadius = -1;
+                outerRing.neighbourUnloaded = [];
+                outerRing.allUnloaded = [];
+                outerRing.needsLoading = 0;
+            }
+            if (innerRing) {
+                innerRing.radius = -1;
+                innerRing.allowedRadius = -1;
+                innerRing.neighbourUnloaded = [];
+                innerRing.allUnloaded = [];
+                innerRing.needsLoading = 0;
+            }
+            if (chunks) {
+                for (let x = 0; x < chunks.length; x++) {
+                    for (let y = 0; y < chunks[x].length; y++) {
+                        chunks[x][y] = 0;
+                    }
+                }
+            }
+        }
+
         showLoading();
 
         let loadedCount = 0;
@@ -665,7 +692,6 @@ async function fetchDataForUUIDs(season) {
             }
         });
 
-        // Store result in cache
         seasonCache[cacheKey] = [...playerData];
 
         sortPlayerData();
@@ -919,22 +945,39 @@ function displayPlayerData() {
     });
 }
 
+function getSelectedSeasonForExport() {
+    if (activeSeason) return String(activeSeason);
+    const seasonSelect = document.getElementById('seasonSelect');
+    if (seasonSelect && seasonSelect.value) return String(seasonSelect.value);
+    return "current";
+}
+
+
 function convertToCSV() {
     const clickTime = new Date();
     const moment = window.moment;
     const timestamp = moment(clickTime).format('YYYY-MM-DD~HH:mm:ss');
 
-    let csv = '#,Nickname,Elo Rate,Best Time,Avg Time,Win Rate,FF Rate\n';
+    const seasonValue = getSelectedSeasonForExport();
+
+    let csv = '';
+    csv += `Season: ${seasonValue}\n`;
+    csv += `Exported at: ${timestamp}\n`;
+    csv += `\n`; 
+
+    csv += '#,Nickname,Elo Rate,Best Time,Avg Time,Win Rate,FF Rate\n';
 
     playerData.forEach((userData, index) => {
-        let winRate = (userData.winsRanked + userData.losesRanked > 0) 
-            ? (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 
+        let winRate = (userData.winsRanked + userData.losesRanked > 0)
+            ? (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100
             : 0;
 
-        csv += `${index + 1},${userData.nickname},${userData.eloRate},${userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-'},${userData.avgTime ? formatTime(userData.avgTime) : '-'},${winRate.toFixed(2)}%,${userData.ffRate.toFixed(2)}%\n`;
+        csv += `${index + 1},${userData.nickname},${userData.eloRate},` +
+               `${userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-'},` +
+               `${userData.avgTime ? formatTime(userData.avgTime) : '-'},` +
+               `${winRate.toFixed(2)}%,${userData.ffRate.toFixed(2)}%\n`;
     });
 
-    csv += 'Downloaded at ' + timestamp;
     return csv;
 }
 
@@ -949,7 +992,8 @@ function downloadCSV() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const filename = `ranked_table_${timestamp}.csv`;
+      const seasonValue = getSelectedSeasonForExport();
+      const filename = `ranked_table_season_${seasonValue}_${timestamp}.csv`;
       a.download = filename;
   
       document.body.appendChild(a);
@@ -964,7 +1008,6 @@ document.getElementById('downloadButton').addEventListener('click', downloadCSV)
 
 let countDownDate;
 
-// Initial season setup and building the selector
 fetch('https://mcsrranked.com/api/leaderboard')
   .then(response => response.json())
   .then(currentData => {
@@ -984,6 +1027,7 @@ fetch('https://mcsrranked.com/api/leaderboard')
             option.selected = true;
           }
           seasonSelect.appendChild(option);
+            syncPixelSelectFromNative();
         }
 
         seasonSelect.addEventListener('change', function() {
@@ -998,10 +1042,8 @@ fetch('https://mcsrranked.com/api/leaderboard')
             activeSeason = newSeason;
           }
           
-          // Use history API instead of full reload
           history.pushState({}, '', url);
           
-          // Trigger the data load
           fetchDataForUUIDs(activeSeason);
         });
       }
@@ -1009,7 +1051,6 @@ fetch('https://mcsrranked.com/api/leaderboard')
   })
   .catch(error => console.error("Error initializing season data:", error));
 
-// Handle browser back/forward buttons
 window.addEventListener('popstate', () => {
     const urlParams = new URLSearchParams(window.location.search);
     activeSeason = urlParams.get('season');
@@ -1018,7 +1059,7 @@ window.addEventListener('popstate', () => {
     const seasonSelect = document.getElementById('seasonSelect');
     if (seasonSelect) {
         if (!activeSeason) {
-            seasonSelect.selectedIndex = 0; // Assuming first is latest
+            seasonSelect.selectedIndex = 0;
         } else {
             seasonSelect.value = activeSeason;
         }
@@ -1026,6 +1067,77 @@ window.addEventListener('popstate', () => {
     
     fetchDataForUUIDs(activeSeason);
 });
+
+function syncPixelSelectFromNative() {
+  const root = document.getElementById("seasonSelectUI");
+  const native = document.getElementById("seasonSelect");
+  const btn = root.querySelector(".pixel-select__btn");
+  const valueEl = root.querySelector(".pixel-select__value");
+  const list = root.querySelector(".pixel-select__list");
+
+  list.innerHTML = "";
+  [...native.options].forEach((opt) => {
+    const li = document.createElement("li");
+    li.className = "pixel-select__opt";
+    li.setAttribute("role", "option");
+    li.dataset.value = opt.value;
+    li.textContent = opt.textContent;
+
+    if (opt.selected) li.classList.add("is-selected");
+    list.appendChild(li);
+  });
+
+  const selected = native.options[native.selectedIndex];
+  valueEl.textContent = selected ? selected.textContent : "—";
+
+    const close = () => {
+    if (!root.classList.contains("is-open")) return;
+
+    list.classList.add("exit");
+    btn.setAttribute("aria-expanded", "false");
+
+    const onEnd = (ev) => {
+        if (ev.target !== list) return;
+
+        list.classList.remove("exit");
+        root.classList.remove("is-open");
+        list.removeEventListener("animationend", onEnd);
+    };
+
+    list.addEventListener("animationend", onEnd);
+    };
+
+    btn.onclick = () => {
+    const open = !root.classList.contains("is-open");
+
+    if (open) {
+        list.classList.remove("exit");
+        root.classList.add("is-open");
+        btn.setAttribute("aria-expanded", "true");
+    } else {
+        close();
+    }
+    };
+
+  list.onclick = (e) => {
+    const item = e.target.closest(".pixel-select__opt");
+    if (!item) return;
+
+    native.value = item.dataset.value;
+
+    list.querySelectorAll(".pixel-select__opt").forEach(x => x.classList.remove("is-selected"));
+    item.classList.add("is-selected");
+    valueEl.textContent = item.textContent;
+
+    native.dispatchEvent(new Event("change", { bubbles: true }));
+    close();
+  };
+
+  document.addEventListener("click", (e) => {
+    if (!root.contains(e.target)) close();
+  }, { capture: true });
+}
+
 
 let x = setInterval(function() {
     if (!countDownDate) return; 
