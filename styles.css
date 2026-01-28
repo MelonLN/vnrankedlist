@@ -75,13 +75,41 @@ th:nth-child(6):hover {
   background-color: #1f454b;
 }
 
-th:nth-child(1), td:nth-child(1) { width: 4%; padding: 0px; }
-th:nth-child(2), td:nth-child(2) { width: 30%; }
-th:nth-child(3), td:nth-child(3) { width: 10%; }
-th:nth-child(4), td:nth-child(4) { width: 15%; }
-th:nth-child(5), td:nth-child(5) { width: 15%; }
-th:nth-child(6), td:nth-child(6) { width: 11%; }
-th:nth-child(7), td:nth-child(7) { width: 11%; }
+/* --- ĐỊNH NGHĨA WIDTH CỘT MẶC ĐỊNH (KHI TẮT FILTER) --- */
+th:nth-child(1), td:nth-child(1) { width: 4%; padding: 0px; } /* Rank (#) */
+th:nth-child(2), td:nth-child(2) { width: 30%; } /* Name */
+th:nth-child(3), td:nth-child(3) { width: 10%; } /* Elo */
+th:nth-child(4), td:nth-child(4) { width: 15%; } /* Best Time */
+th:nth-child(5), td:nth-child(5) { width: 15%; } /* Avg Time */
+th:nth-child(6), td:nth-child(6) { width: 11%; } /* Win Rate */
+th:nth-child(7), td:nth-child(7) { width: 11%; } /* FF Rate */
+
+/* --- FIX WIDTH CỘT KHI BẬT FILTER (KHI CÓ CỘT CHECKBOX) --- */
+/* Sử dụng :has() để check nếu dòng có chứa class .checkbox-col thì áp dụng width mới */
+
+/* Cột 1 là Checkbox (đã style riêng ở dưới), các cột sau bị đẩy lùi 1 index */
+
+/* Cột 2 (Rank #) - Cần về lại 4% */
+tr:has(.checkbox-col) > *:nth-child(2) { width: 4% !important; }
+
+/* Cột 3 (Name) - Cần về lại 30% */
+tr:has(.checkbox-col) > *:nth-child(3) { width: 30% !important; }
+
+/* Cột 4 (Elo) - Cần về lại 10% */
+tr:has(.checkbox-col) > *:nth-child(4) { width: 10% !important; }
+
+/* Cột 5 (Best Time) - Cần về lại 15% */
+tr:has(.checkbox-col) > *:nth-child(5) { width: 15% !important; }
+
+/* Cột 6 (Avg Time) - Cần về lại 15% */
+tr:has(.checkbox-col) > *:nth-child(6) { width: 15% !important; }
+
+/* Cột 7 (Win Rate) - Cần về lại 11% */
+tr:has(.checkbox-col) > *:nth-child(7) { width: 11% !important; }
+
+/* Cột 8 (FF Rate) - Cần về lại 11% */
+tr:has(.checkbox-col) > *:nth-child(8) { width: 11% !important; }
+
 
 td[data-date]::before {
   content: attr(data-date);
@@ -420,8 +448,10 @@ h1 {
   position: absolute;
 }
 
+/* --- UPDATED BUTTON STYLES --- */
 #Sub,
-#downloadButton {
+#downloadButton,
+#filterBtn {
   cursor: pointer;
   align-items: center;
   justify-content: center;
@@ -435,16 +465,31 @@ h1 {
   width: 150px;
   text-align: center;
   font-family:"mcfont", monospace;
+  border: 2px solid #555;
+  box-shadow: 0 4px 0 #000;
+  transition: all 0.2s ease;
+  top: 0;
 }
 
 #Sub:hover,
 #btsm:hover,
 #search:hover,
-#downloadButton:hover {
+#downloadButton:hover,
+#filterBtn:hover {
   cursor: pointer;
   background-color: #1f454b;
   animation: animation 0.4s;
+  border-color: #87ce34;
+  top: -2px;
+  box-shadow: 0 6px 0 #000;
 } 
+
+#Sub:active,
+#downloadButton:active,
+#filterBtn:active {
+    top: 2px;
+    box-shadow: 0 0 0 #000;
+}
 
 @keyframes animation {
     0%{
@@ -1030,6 +1075,106 @@ main {
 
 .resizing-active iframe {
     pointer-events: none;      
+}
+
+/* --- SIDEBAR & CHECKBOX STYLES --- */
+
+/* Sidebar Styles */
+.filter-sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px; /* Ẩn bên phải */
+    width: 300px;
+    height: 100%;
+    background: #1e1e1e; /* Màu nền tối */
+    box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+    transition: right 0.3s ease;
+    z-index: 1001; /* Cao hơn các thành phần khác */
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-left: 1px solid #444;
+}
+
+.filter-sidebar.active {
+    right: 0; /* Hiện ra */
+}
+
+.filter-header {
+    padding: 15px;
+    background: #252526;
+    border-bottom: 1px solid #3e3e42;
+    display: flex;
+    justify-content: space-between; /* Fix lỗi chữ bị đè */
+    align-items: center;
+}
+
+/* Fix nút Close bị đè do style global .iframe-close có position: absolute */
+.filter-header .iframe-close {
+    position: static !important;
+    text-align: right;
+    width: auto;
+}
+
+.filter-content {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.range-inputs {
+    display: flex;
+    gap: 10px;
+}
+
+.range-inputs input {
+    width: 100%;
+    padding: 5px;
+    background: #333;
+    border: 1px solid #555;
+    color: white;
+    border-radius: 4px;
+}
+
+.filter-actions button {
+    width: 100%;
+    padding: 8px;
+    background: #d9534f;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.filter-actions button:hover {
+    background: #c9302c;
+}
+
+/* Checkbox Column Styling - Fix lỗi checkbox to */
+th.checkbox-col, td.checkbox-col {
+    width: 40px !important;
+    text-align: center;
+    padding: 0;
+}
+
+input[type="checkbox"].filter-check {
+    cursor: pointer;
+    width: 16px; /* Resize nhỏ lại 16px */
+    height: 16px;
+    margin: 0 auto;
+    display: block;
+    accent-color: #87ce34;
 }
 
 @media (max-width: 1023px) {

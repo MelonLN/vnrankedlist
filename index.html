@@ -49,6 +49,7 @@
             </div>
             <div class="button-container">
                 <button id="Sub">Subscribe</button>
+                <button id="filterBtn">Filter</button>
                 <button id="downloadButton">Download Table</button>
             </div>
         </div>
@@ -121,6 +122,57 @@
             </thead>
             <tbody id="rankedBody"></tbody>
         </table>
+        <aside id="filterSidebar" class="filter-sidebar">
+            <div class="filter-header">
+                <h3>Filter Options</h3>
+                <span id="closeFilter" class="iframe-close">×</span>
+            </div>
+            <div class="filter-content">
+                <div class="filter-group">
+                    <label>Elo Range:</label>
+                    <div class="range-inputs">
+                        <input type="number" id="minElo" placeholder="Min">
+                        <input type="number" id="maxElo" placeholder="Max">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Best Time (mm:ss):</label>
+                    <div class="range-inputs">
+                        <input type="text" id="minTime" placeholder="Min">
+                        <input type="text" id="maxTime" placeholder="Max">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Avg Time (mm:ss):</label>
+                    <div class="range-inputs">
+                        <input type="text" id="minAvg" placeholder="Min">
+                        <input type="text" id="maxAvg" placeholder="Max">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Win Rate (%):</label>
+                    <div class="range-inputs">
+                        <input type="number" id="minWin" placeholder="0">
+                        <input type="number" id="maxWin" placeholder="100">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>FF Rate (%):</label>
+                    <div class="range-inputs">
+                        <input type="number" id="minFF" placeholder="0">
+                        <input type="number" id="maxFF" placeholder="100">
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button id="resetFilters">Reset All</button>
+                </div>
+            </div>
+        </aside>
         <div id="loading-contai">
             <canvas id="loadingCanvas" class="image-pixelated" width="21" height="21"></canvas>
         </div>

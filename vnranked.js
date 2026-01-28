@@ -6,9 +6,18 @@ let outerRing = null;
 let innerRing = null;
 let isDataLoaded = false; 
 
+let isFilterOpen = false;
+let hiddenUUIDs = new Set();
+let filterValues = {
+    minElo: null, maxElo: null,
+    minTime: null, maxTime: null,
+    minAvg: null, maxAvg: null,
+    minWin: null, maxWin: null,
+    minFF: null, maxFF: null
+};
+
 const seasonCache = {};
 
-// Parse season from URL
 const urlParams = new URLSearchParams(window.location.search);
 let activeSeason = urlParams.get('season');
 
@@ -813,12 +822,73 @@ document.addEventListener('DOMContentLoaded', function() {
         activateArrow(winArrow);
     });
 
+    const filterBtn = document.getElementById('filterBtn');
+    const filterSidebar = document.getElementById('filterSidebar');
+    const closeFilter = document.getElementById('closeFilter');
+    const resetFilterBtn = document.getElementById('resetFilters');
+
+    function toggleFilter() {
+        isFilterOpen = !isFilterOpen;
+        if (isFilterOpen) {
+            filterSidebar.classList.add('active');
+        } else {
+            filterSidebar.classList.remove('active');
+        }
+        displayPlayerData();
+    }
+
+    if (filterBtn) filterBtn.addEventListener('click', toggleFilter);
+    if (closeFilter) closeFilter.addEventListener('click', toggleFilter);
+
+    const inputs = [
+        { id: 'minElo', key: 'minElo', type: 'int' },
+        { id: 'maxElo', key: 'maxElo', type: 'int' },
+        { id: 'minWin', key: 'minWin', type: 'float' },
+        { id: 'maxWin', key: 'maxWin', type: 'float' },
+        { id: 'minFF', key: 'minFF', type: 'float' },
+        { id: 'maxFF', key: 'maxFF', type: 'float' },
+        { id: 'minTime', key: 'minTime', type: 'time' },
+        { id: 'maxTime', key: 'maxTime', type: 'time' },
+        { id: 'minAvg', key: 'minAvg', type: 'time' },
+        { id: 'maxAvg', key: 'maxAvg', type: 'time' }
+    ];
+
+    inputs.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (el) {
+            el.addEventListener('input', () => {
+                let val = el.value.trim();
+                if (val === '') {
+                    filterValues[item.key] = null;
+                } else {
+                    if (item.type === 'int') filterValues[item.key] = parseInt(val);
+                    else if (item.type === 'float') filterValues[item.key] = parseFloat(val);
+                    else if (item.type === 'time') filterValues[item.key] = parseTimeToMs(val);
+                }
+                displayPlayerData();
+            });
+        }
+    });
+
+    if (resetFilterBtn) {
+        resetFilterBtn.addEventListener('click', () => {
+            inputs.forEach(item => {
+                const el = document.getElementById(item.id);
+                if (el) el.value = '';
+                filterValues[item.key] = null;
+            });
+            hiddenUUIDs.clear();
+            displayPlayerData();
+        });
+    }
+
     fetchDataForUUIDs(activeSeason);
 });
 
 const profileModal = document.getElementById('profileModal');
 const profileIframe = document.getElementById('profileIframe');
-const profileCloseBtn = document.querySelector('.iframe-close');
+// SỬA: Chọn đúng nút đóng của profile modal (trong block #close-modal) thay vì lấy phần tử đầu tiên có class .iframe-close
+const profileCloseBtn = document.querySelector('#close-modal .iframe-close'); 
 const closemodal = document.getElementById('close-modal');
 
 
@@ -871,15 +941,76 @@ if (profileModal) {
 
 function displayPlayerData() {
     const rankedBody = document.getElementById('rankedBody');
+    const tableHeadRow = document.querySelector('#rankedTable thead tr');
+    
+    // Xử lý Header Checkbox
+    let existingCheckTh = tableHeadRow.querySelector('.checkbox-col');
+    if (isFilterOpen) {
+        if (!existingCheckTh) {
+            const th = document.createElement('th');
+            th.className = 'checkbox-col';
+            th.textContent = 'Show';
+            tableHeadRow.insertBefore(th, tableHeadRow.firstChild);
+        }
+    } else {
+        if (existingCheckTh) {
+            existingCheckTh.remove();
+        }
+    }
+
     rankedBody.innerHTML = '';
 
-    playerData.forEach((userData, index) => {
+    let displayIndex = 1;
+
+    playerData.forEach((userData) => {
+        const passesFilter = checkFilterPass(userData);
+        
+        let passesNumeric = true;
+        if (filterValues.minElo !== null && userData.eloRate < filterValues.minElo) passesNumeric = false;
+        if (filterValues.maxElo !== null && userData.eloRate > filterValues.maxElo) passesNumeric = false;
+
+        let shouldRender = false;
+        let isManualHidden = hiddenUUIDs.has(userData.uuid);
+
+        let numericPass = true;
+        if (filterValues.minElo !== null && userData.eloRate < filterValues.minElo) numericPass = false;
+        if (filterValues.maxElo !== null && userData.eloRate > filterValues.maxElo) numericPass = false;
+        
+        if (isFilterOpen) {
+             if (checkNumericFilters(userData)) shouldRender = true;
+        } else {
+            if (checkFilterPass(userData)) shouldRender = true;
+        }
+
+        if (!shouldRender) return;
+
         const row = rankedBody.insertRow();
-        const rankCell = row.insertCell(0);
-        rankCell.textContent = index + 1;
+        row.classList.add('player-row');
+
+        if (isFilterOpen) {
+            const checkCell = row.insertCell(0);
+            checkCell.className = 'checkbox-col';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.className = 'filter-check';
+            cb.checked = !isManualHidden;
+            
+            cb.onclick = (e) => {
+                e.stopPropagation();
+                if (cb.checked) {
+                    hiddenUUIDs.delete(userData.uuid);
+                } else {
+                    hiddenUUIDs.add(userData.uuid);
+                }
+            };
+            checkCell.appendChild(cb);
+        }
+
+        const rankCell = row.insertCell();
+        rankCell.textContent = displayIndex++;
         rankCell.style.textAlign = 'center';
 
-        const nameCell = row.insertCell(1);
+        const nameCell = row.insertCell();
         nameCell.style.textAlign = 'left';
         const profileNameContainer = document.createElement('div');
         profileNameContainer.style.display = 'inline-block';
@@ -898,15 +1029,15 @@ function displayPlayerData() {
         profileNameContainer.appendChild(playerName);
         nameCell.appendChild(profileNameContainer);
 
-        const eloCell = row.insertCell(2);
+        const eloCell = row.insertCell();
         eloCell.textContent = userData.eloRate;
         eloCell.style.textAlign = 'center';
 
-        const bestTimeCell = row.insertCell(3);
+        const bestTimeCell = row.insertCell();
         bestTimeCell.textContent = userData.bestTimeRanked ? formatTime(userData.bestTimeRanked) : '-';
         bestTimeCell.style.textAlign = 'center';
 
-        const avgTimeCell = row.insertCell(4);
+        const avgTimeCell = row.insertCell();
         avgTimeCell.textContent = userData.avgTime ? formatTime(userData.avgTime) : '-';
         avgTimeCell.style.textAlign = 'center';
 
@@ -915,34 +1046,55 @@ function displayPlayerData() {
             : 0;
         let ffRate = userData.ffRate.toFixed(2);
 
-        const winRateCell = row.insertCell(5);
+        const winRateCell = row.insertCell();
         winRateCell.textContent = winRate.toFixed(2) + "%";
         winRateCell.style.textAlign = 'center';
 
-        const ffRateCell = row.insertCell(6);
+        const ffRateCell = row.insertCell();
         ffRateCell.textContent = `${ffRate}%`;
         ffRateCell.style.textAlign = 'center';
 
-        if (userData.eloRate >= 2000) {
-            eloCell.style.color = 'purple';
-        } else if (userData.eloRate >= 1500 && userData.eloRate <= 1999) {
-            eloCell.style.color = 'cyan';
-        } else if (userData.eloRate >= 1200 && userData.eloRate <= 1499) {
-            eloCell.style.color = 'lime';
-        } else if (userData.eloRate >= 900 && userData.eloRate <= 1199) {
-            eloCell.style.color = 'gold';
-        } else if (userData.eloRate >= 600 && userData.eloRate <= 899) {
-            eloCell.style.color = 'silver';
-        } else {
-            eloCell.style.color = 'black';
-        }
+        if (userData.eloRate >= 2000) eloCell.style.color = 'purple';
+        else if (userData.eloRate >= 1500) eloCell.style.color = 'cyan';
+        else if (userData.eloRate >= 1200) eloCell.style.color = 'lime';
+        else if (userData.eloRate >= 900) eloCell.style.color = 'gold';
+        else if (userData.eloRate >= 600) eloCell.style.color = 'silver';
+        else eloCell.style.color = 'black';
 
-        row.addEventListener('click', function () {
-            openProfilePopup(userData.nickname);
+        row.addEventListener('click', function (e) {
+            if (e.target.type !== 'checkbox') {
+                openProfilePopup(userData.nickname);
+            }
         });
-
-        row.classList.add('player-row');
     });
+}
+
+function checkNumericFilters(player) {
+    if (filterValues.minElo !== null && player.eloRate < filterValues.minElo) return false;
+    if (filterValues.maxElo !== null && player.eloRate > filterValues.maxElo) return false;
+
+    let winRate = (player.winsRanked + player.losesRanked > 0) 
+        ? (player.winsRanked / (player.winsRanked + player.losesRanked)) * 100 : 0;
+    if (filterValues.minWin !== null && winRate < filterValues.minWin) return false;
+    if (filterValues.maxWin !== null && winRate > filterValues.maxWin) return false;
+
+    if (filterValues.minFF !== null && player.ffRate < filterValues.minFF) return false;
+    if (filterValues.maxFF !== null && player.ffRate > filterValues.maxFF) return false;
+
+    if (filterValues.minTime !== null) {
+        if (!player.bestTimeRanked || player.bestTimeRanked < filterValues.minTime) return false;
+    }
+    if (filterValues.maxTime !== null) {
+        if (!player.bestTimeRanked || player.bestTimeRanked > filterValues.maxTime) return false;
+    }
+
+    if (filterValues.minAvg !== null) {
+        if (!player.avgTime || player.avgTime < filterValues.minAvg) return false;
+    }
+    if (filterValues.maxAvg !== null) {
+        if (!player.avgTime || player.avgTime > filterValues.maxAvg) return false;
+    }
+    return true;
 }
 
 function getSelectedSeasonForExport() {
@@ -1281,4 +1433,45 @@ if (dragHandle && modalSidebar) {
         window.removeEventListener('mousemove', resizeSidebar);
         window.removeEventListener('mouseup', stopResizingSidebar);
     }
+}
+
+function parseTimeToMs(timeStr) {
+    if (!timeStr) return null;
+    const parts = timeStr.split(':');
+    if (parts.length !== 2) return null;
+    const min = parseInt(parts[0], 10);
+    const sec = parseInt(parts[1], 10);
+    if (isNaN(min) || isNaN(sec)) return null;
+    return (min * 60 + sec) * 1000;
+}
+
+function checkFilterPass(player) {
+    if (hiddenUUIDs.has(player.uuid)) return false;
+
+    if (filterValues.minElo !== null && player.eloRate < filterValues.minElo) return false;
+    if (filterValues.maxElo !== null && player.eloRate > filterValues.maxElo) return false;
+
+    let winRate = (player.winsRanked + player.losesRanked > 0) 
+        ? (player.winsRanked / (player.winsRanked + player.losesRanked)) * 100 : 0;
+    if (filterValues.minWin !== null && winRate < filterValues.minWin) return false;
+    if (filterValues.maxWin !== null && winRate > filterValues.maxWin) return false;
+
+    if (filterValues.minFF !== null && player.ffRate < filterValues.minFF) return false;
+    if (filterValues.maxFF !== null && player.ffRate > filterValues.maxFF) return false;
+
+    if (filterValues.minTime !== null) {
+        if (!player.bestTimeRanked || player.bestTimeRanked < filterValues.minTime) return false;
+    }
+    if (filterValues.maxTime !== null) {
+        if (!player.bestTimeRanked || player.bestTimeRanked > filterValues.maxTime) return false;
+    }
+
+    if (filterValues.minAvg !== null) {
+        if (!player.avgTime || player.avgTime < filterValues.minAvg) return false;
+    }
+    if (filterValues.maxAvg !== null) {
+        if (!player.avgTime || player.avgTime > filterValues.maxAvg) return false;
+    }
+
+    return true;
 }
