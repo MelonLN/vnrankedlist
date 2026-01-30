@@ -1475,3 +1475,30 @@ function checkFilterPass(player) {
 
     return true;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    var champModal = document.getElementById("championshipModal");
+    var champBtn = document.getElementById("championshipBtn");
+    var champClose = document.getElementsByClassName("close-champ")[0];
+
+    // Khi bấm nút Championship thì mở Modal
+    if (champBtn) {
+        champBtn.onclick = function() {
+            champModal.style.display = "flex";
+        }
+    }
+
+    // Khi bấm nút X thì đóng Modal
+    if (champClose) {
+        champClose.onclick = function() {
+            champModal.style.display = "none";
+        }
+    }
+
+    // Khi bấm ra ngoài vùng trắng thì đóng Modal (dùng chung logic đóng modal)
+    window.addEventListener('click', function(event) {
+        if (event.target == champModal) {
+            champModal.style.display = "none";
+        }
+    });
+});

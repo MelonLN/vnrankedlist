@@ -448,9 +448,9 @@ h1 {
   position: absolute;
 }
 
-/* --- UPDATED BUTTON STYLES --- */
 #Sub,
 #downloadButton,
+#championshipBtn,
 #filterBtn {
   cursor: pointer;
   align-items: center;
@@ -475,6 +475,7 @@ h1 {
 #btsm:hover,
 #search:hover,
 #downloadButton:hover,
+#championshipBtn:hover,
 #filterBtn:hover {
   cursor: pointer;
   background-color: #1f454b;
@@ -486,6 +487,7 @@ h1 {
 
 #Sub:active,
 #downloadButton:active,
+#championshipBtn:active,
 #filterBtn:active {
     top: 2px;
     box-shadow: 0 0 0 #000;
@@ -1161,7 +1163,6 @@ main {
     background: #c9302c;
 }
 
-/* Checkbox Column Styling - Fix lỗi checkbox to */
 th.checkbox-col, td.checkbox-col {
     width: 40px !important;
     text-align: center;
@@ -1170,11 +1171,65 @@ th.checkbox-col, td.checkbox-col {
 
 input[type="checkbox"].filter-check {
     cursor: pointer;
-    width: 16px; /* Resize nhỏ lại 16px */
+    width: 16px;
     height: 16px;
     margin: 0 auto;
     display: block;
     accent-color: #87ce34;
+}
+
+.live-btn {
+    display: inline-block;
+    background-color: #ff0000;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 0px;
+    font-size: 18px;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+    font-family: "Mcfont", monospace;
+    border: 2px solid #555;
+    box-shadow: 0 4px 0 #000;
+}
+
+.live-btn:hover {
+    background-color: #cc0000;
+    border-color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #000;
+}
+
+.live-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 #000;
+}
+
+.close-champ {
+    color: #fff;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+.close-champ:hover {
+    color: #ff5555;
+    opacity: 1;
+}
+
+#championshipModal .champ-content {
+    padding: 0 !important;
+    width: 850px !important; 
+    max-width: 95vw;
+    background-color: transparent;
+    border: 2px solid #fff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#championshipModal iframe {
+    display: block;
+    width: 100%;
 }
 
 @media (max-width: 1023px) {
