@@ -1,0 +1,110 @@
+{
+  "seasons": [
+    {
+      "id": "1",
+      "name": "1",
+      "participants": {
+        "1": { "name": "Mitthui", "points": 0 },
+        "2": { "name": "semcomet", "points": 0 },
+        "3": { "name": "ItzUser", "points": 0 },
+        "4": { "name": "shrddr", "points": 0 },
+        "5": { "name": "100ksup", "points": 75 },
+        "6": { "name": "hackingpotato_", "points": 73 },
+        "7": { "name": "Big_sister_Loji", "points": 65 },
+        "8": { "name": "ToanDz_123", "points": 60 }
+      },
+      "rounds": [
+        {
+          "title": "VÒNG SƠ LOẠI",
+          "type": "list",
+          "seeds": [5, 6, 7, 8],
+          "link": "https://youtu.be/epVor7piuPI?t=595"
+        },
+        {
+          "title": "TỨ KẾT",
+          "type": "bracket",
+          "matches": [
+            { "seed1": 1, "s1": 3, "seed2": 5, "s2": 1, "winner": 1, "link": "https://youtu.be/koyXoKcV_44?t=4677" },
+            { "seed1": 4, "s1": 3, "seed2": 7, "s2": 0, "winner": 1, "link": "https://youtu.be/mKmmf5vKqSo?t=595" },
+            { "seed1": 2, "s1": 3, "seed2": 6, "s2": 1, "winner": 1, "link": "https://youtu.be/koyXoKcV_44?t=737" },
+            { "seed1": 3, "s1": 3, "seed2": 8, "s2": 1, "winner": 1, "link": "https://youtu.be/mKmmf5vKqSo?t=4186"}
+          ]
+        },
+        {
+          "title": "BÁN KẾT",
+          "type": "bracket",
+          "matches": [
+            { "seed1": 1, "s1": 3, "seed2": 4, "s2": 0, "winner": 1, "link": "https://youtu.be/YYi2cu7WwGw?t=688" },
+            { "seed1": 2, "s1": 3, "seed2": 3, "s2": 2, "winner": 1, "link": "https://youtu.be/YYi2cu7WwGw?t=4355"}
+          ]
+        },
+        {
+          "title": "CHUNG KẾT",
+          "type": "bracket",
+          "matches": [
+            { "seed1": 1, "s1": 2, "seed2": 2, "s2": 4, "winner": 2, "type": "Grand Finals", "link": "https://youtu.be/Zm6MDlw1u_0?t=6042" },
+            { "seed1": 3, "s1": 3, "seed2": 4, "s2": 2, "winner": 1, "type": "3rd Place", "link": "https://youtu.be/Zm6MDlw1u_0?t=791" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "2",
+      "participants": {
+        "1": { "name": "shrddr", "points": 0 },
+        "2": { "name": "Mitthui", "points": 0 },
+        "3": { "name": "semcomet", "points": 0 },
+        "4": { "name": "hackingpotato_", "points": 0 },
+        "5": { "name": "ItzUser", "points": 7 },
+        "6": { "name": "SKZ", "points": 7 },
+        "7": { "name": "Vlantoy", "points": 4 },
+        "8": { "name": "Taodaiii", "points": 2 },
+        "9": { "name": "shinichi1204", "points": 2 }
+      },
+      "rounds": [
+        {
+          "title": "VÒNG SƠ LOẠI",
+          "type": "list",
+          "seeds": [5, 6, 7, 8, 9, 10, 11, 12]
+        },
+        {
+          "title": "ĐỐI ĐẦU TRỰC TIẾP",
+          "type": "bracket",
+          "matches": [
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 }
+          ]
+        },
+        {
+          "title": "TỨ KẾT",
+          "type": "bracket",
+          "matches": [
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 }
+          ]
+        },
+        {
+          "title": "BÁN KẾT",
+          "type": "bracket",
+          "matches": [
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 }
+          ]
+        },
+        {
+          "title": "CHUNG KẾT",
+          "type": "bracket",
+          "matches": [
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0, "type": "Grand Finals" },
+            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0, "type": "3rd Place" }
+          ]
+        }
+      ]
+    }
+  ]
+}
