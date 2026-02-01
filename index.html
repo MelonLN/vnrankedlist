@@ -41,16 +41,14 @@
                         <span class="pixel-select__value">—</span>
                         <span class="pixel-select__arrow" aria-hidden="true"></span>
                     </button>
-
                     <ul class="pixel-select__list" role="listbox"></ul>
-
                     <select id="seasonSelect" class="pixel-select__native"></select>
                 </div>
             </div>
             <div class="button-container">
                 <button id="Sub">Subscribe</button>
                 <button id="filterBtn">Filter</button>
-                <button id="championshipBtn">Championship</button>
+                <button onclick="window.location.href='championship.html'" id="championshipBtn">Championship</button>
                 <button id="downloadButton">Download Table</button>
             </div>
         </div>
@@ -129,49 +127,12 @@
                 <span id="closeFilter" class="iframe-close">×</span>
             </div>
             <div class="filter-content">
-                <div class="filter-group">
-                    <label>Elo Range:</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minElo" placeholder="Min">
-                        <input type="number" id="maxElo" placeholder="Max">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Best Time (mm:ss):</label>
-                    <div class="range-inputs">
-                        <input type="text" id="minTime" placeholder="Min">
-                        <input type="text" id="maxTime" placeholder="Max">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Avg Time (mm:ss):</label>
-                    <div class="range-inputs">
-                        <input type="text" id="minAvg" placeholder="Min">
-                        <input type="text" id="maxAvg" placeholder="Max">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Win Rate (%):</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minWin" placeholder="0">
-                        <input type="number" id="maxWin" placeholder="100">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>FF Rate (%):</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minFF" placeholder="0">
-                        <input type="number" id="maxFF" placeholder="100">
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button id="resetFilters">Reset All</button>
-                </div>
+                <div class="filter-group"><label>Elo Range:</label><div class="range-inputs"><input type="number" id="minElo" placeholder="Min"><input type="number" id="maxElo" placeholder="Max"></div></div>
+                <div class="filter-group"><label>Best Time (mm:ss):</label><div class="range-inputs"><input type="text" id="minTime" placeholder="Min"><input type="text" id="maxTime" placeholder="Max"></div></div>
+                <div class="filter-group"><label>Avg Time (mm:ss):</label><div class="range-inputs"><input type="text" id="minAvg" placeholder="Min"><input type="text" id="maxAvg" placeholder="Max"></div></div>
+                <div class="filter-group"><label>Win Rate (%):</label><div class="range-inputs"><input type="number" id="minWin" placeholder="0"><input type="number" id="maxWin" placeholder="100"></div></div>
+                <div class="filter-group"><label>FF Rate (%):</label><div class="range-inputs"><input type="number" id="minFF" placeholder="0"><input type="number" id="maxFF" placeholder="100"></div></div>
+                <div class="filter-actions"><button id="resetFilters">Reset All</button></div>
             </div>
         </aside>
         <div id="loading-contai">
@@ -185,74 +146,51 @@
     </main>
     <aside id="profileModal" class="iframe-modal">
         <div id="resizer" class="resizer"></div>
-        <div class="block" id="close-modal">
-            <span class="iframe-close">×</span>
-        </div>
+        <div class="block" id="close-modal"><span class="iframe-close">×</span></div>
         <div class="iframe-modal-content">
-            <iframe
-                id="profileIframe"
-                src=""
-                frameborder="0"
-                allowfullscreen>
-            </iframe>
+            <iframe id="profileIframe" src="" frameborder="0" allowfullscreen></iframe>
         </div>
     </aside>
     <svg style="display:none" aria-hidden="true">
-        <symbol id="sort-arrow"
-                viewBox="0 0 224 112"
-                shape-rendering="crispEdges">
-                <rect x="96" y="0"   width="16" height="16" fill="#ffffff"/>
-                <rect x="80" y="16"  width="16" height="16" fill="#ffffff"/>
-                <rect x="96" y="16"  width="16" height="16" fill="#ffffff"/>
-                <rect x="112" y="16" width="16" height="16" fill="#ffffff"/>
-                <rect x="64" y="32"  width="16" height="16" fill="#ffffff"/>
-                <rect x="80" y="32"  width="16" height="16" fill="#ffffff"/>
-                <rect x="96" y="32"  width="16" height="16" fill="#ffffff"/>
-                <rect x="112" y="32" width="16" height="16" fill="#ffffff"/>
-                <rect x="128" y="32" width="16" height="16" fill="#ffffff"/>
-                <rect x="48" y="48"  width="16" height="16" fill="#ffffff"/>
-                <rect x="64" y="48"  width="16" height="16" fill="#ffffff"/>
-                <rect x="80" y="48"  width="16" height="16" fill="#ffffff"/>
-                <rect x="96" y="48"  width="16" height="16" fill="#ffffff"/>
-                <rect x="112" y="48" width="16" height="16" fill="#ffffff"/>
-                <rect x="128" y="48" width="16" height="16" fill="#ffffff"/>
-                <rect x="144" y="48" width="16" height="16" fill="#ffffff"/>
-                <rect x="32" y="64"  width="16" height="16" fill="#ffffff"/>
-                <rect x="48" y="64"  width="16" height="16" fill="#ffffff"/>
-                <rect x="64" y="64"  width="16" height="16" fill="#ffffff"/>
-                <rect x="80" y="64"  width="16" height="16" fill="#ffffff"/>
-                <rect x="96" y="64"  width="16" height="16" fill="#ffffff"/>
-                <rect x="112" y="64" width="16" height="16" fill="#ffffff"/>
-                <rect x="128" y="64" width="16" height="16" fill="#ffffff"/>
-                <rect x="144" y="64" width="16" height="16" fill="#ffffff"/>
-                <rect x="160" y="64" width="16" height="16" fill="#ffffff"/>
-                <rect x="16" y="80"  width="16" height="16" fill="#ffffff"/>
-                <rect x="32" y="80"  width="16" height="16" fill="#ffffff"/>
-                <rect x="48" y="80"  width="16" height="16" fill="#ffffff"/>
-                <rect x="64" y="80"  width="16" height="16" fill="#ffffff"/>
-                <rect x="80" y="80"  width="16" height="16" fill="#ffffff"/>
-                <rect x="96" y="80"  width="16" height="16" fill="#ffffff"/>
-                <rect x="112" y="80" width="16" height="16" fill="#ffffff"/>
-                <rect x="128" y="80" width="16" height="16" fill="#ffffff"/>
-                <rect x="144" y="80" width="16" height="16" fill="#ffffff"/>
-                <rect x="160" y="80" width="16" height="16" fill="#ffffff"/>
-                <rect x="176" y="80" width="16" height="16" fill="#ffffff"/> 
+        <symbol id="sort-arrow" viewBox="0 0 224 112" shape-rendering="crispEdges">
+            <rect x="96" y="0"   width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="16"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="16"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="16" width="16" height="16" fill="#ffffff"/>
+            <rect x="64" y="32"  width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="32"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="32"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="32" width="16" height="16" fill="#ffffff"/>
+            <rect x="128" y="32" width="16" height="16" fill="#ffffff"/>
+            <rect x="48" y="48"  width="16" height="16" fill="#ffffff"/>
+            <rect x="64" y="48"  width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="48"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="48"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="48" width="16" height="16" fill="#ffffff"/>
+            <rect x="128" y="48" width="16" height="16" fill="#ffffff"/>
+            <rect x="144" y="48" width="16" height="16" fill="#ffffff"/>
+            <rect x="32" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="48" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="64" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="64" width="16" height="16" fill="#ffffff"/>
+            <rect x="128" y="64" width="16" height="16" fill="#ffffff"/>
+            <rect x="144" y="64" width="16" height="16" fill="#ffffff"/>
+            <rect x="160" y="64" width="16" height="16" fill="#ffffff"/>
+            <rect x="16" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="32" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="48" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="64" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="80" width="16" height="16" fill="#ffffff"/>
+            <rect x="128" y="80" width="16" height="16" fill="#ffffff"/>
+            <rect x="144" y="80" width="16" height="16" fill="#ffffff"/>
+            <rect x="160" y="80" width="16" height="16" fill="#ffffff"/>
+            <rect x="176" y="80" width="16" height="16" fill="#ffffff"/> 
         </symbol>
     </svg>
-    <div id="championshipModal" class="modal">
-        <div class="modal-content" style="width: 90%; max-width: 850px; text-align: center;">
-            <span class="close-champ" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>
-            <h2 style="margin-top: 0; color: #ffffff;">VNMCSR Championship</h2>
-            
-            <div style="margin: 20px 0;">
-                <iframe src="https://challonge.com/canhvjpplayoff/module" width="100%" height="600" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
-            </div>
-
-            <a href="https://www.youtube.com/@canhvjp/live" target="_blank" class="live-btn">
-                📺 WATCH LIVE
-            </a>
-        </div>
-    </div>
     <script src="vnranked.js" defer></script>
 </body>
 </html>

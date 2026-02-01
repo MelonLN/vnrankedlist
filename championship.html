@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VNMCSR Championship</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="championship.css">
+    <link rel="icon" href="./img/cupout2xl.png" type="image/x-icon">
+</head>
+<body>
+    <main>
+        <header>
+            <div class="logo-container">
+                <img class="big" src="./img/cupout2xl.png" alt="VNMCSR Logo">
+                <div class="logo">
+                    <p class="lg">VNMCSR</p>
+                    <p class="lg">Ranked Data</p>
+                </div>
+            </div>
+        </header>
+
+        <div id="bg">
+            <p id="lead">Championship</p>
+            <div id="showshower">
+                <ul id="nav2">
+                    <li><a href="https://discord.gg/5A8ENtUnZa"><img id="lol3" src="./img/Discord.png" alt="Discord"></a></li>
+                    <li><a href="https://github.com/MelonLN/vnrankedlist"><img id="lol2" src="./img/Github.png" alt="Github"></a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="mode">
+            <div class="season-header">
+                <span id="tt">Season </span>
+                <div class="pixel-select" id="seasonSelectUI">
+                    <button type="button" class="pixel-select__btn" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="pixel-select__value">—</span>
+                        <span class="pixel-select__arrow" aria-hidden="true"></span>
+                    </button>
+                    <ul class="pixel-select__list" role="listbox"></ul>
+                    <select id="seasonSelect" class="pixel-select__native" style="display:none"></select>
+                </div>
+            </div>
+            <div class="button-container">
+                <button onclick="window.location.href='index.html'" id="championshipBtn">Leaderboard</button>
+            </div>
+        </div>
+
+        <div class="info-row-custom">
+            <div class="live-section">
+                <span class="live-at-text">Live at:</span>
+                <a href="https://www.youtube.com/@canhvjp/live" target="_blank" class="live-btn-header">
+                    <div class="yt-top-row">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="yt-logo" alt="YT">
+                        <span class="yt-text">YouTube</span>
+                    </div>
+                    <div class="yt-handle">@canhvjp</div>
+                </a>
+            </div>
+            <p class="discord-info">
+                Để tham gia giải hoặc xem kế hoạch tiếp theo hãy vào <a href="https://discord.gg/5A8ENtUnZa" target="_blank">Discord</a>
+            </p>
+        </div>
+
+        <div class="champ-container-main">
+            <div id="bracket-root" class="bracket-scroll-container">
+                <div class="loading-text">Đang tải bảng đấu...</div>
+            </div>
+        </div>
+
+        <footer>
+            <span id="foot">
+                By <a href="https://canhvjp.pages.dev">Canhvjp</a> & <a href="https://github.com/MelonLN">MelonLN</a>
+            </span>
+        </footer>
+    </main>
+    <script src="championship.js" defer></script>
+</body>
+</html>
