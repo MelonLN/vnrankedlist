@@ -828,13 +828,94 @@ document.addEventListener('DOMContentLoaded', function() {
     const resetFilterBtn = document.getElementById('resetFilters');
 
     function toggleFilter() {
-        isFilterOpen = !isFilterOpen;
-        if (isFilterOpen) {
+        if (!isFilterOpen) {
+            isFilterOpen = true;
+            filterSidebar.classList.remove('filter-close');
             filterSidebar.classList.add('active');
-        } else {
-            filterSidebar.classList.remove('active');
+            displayPlayerData();
+            return;
         }
-        displayPlayerData();
+
+        isFilterOpen = false;
+        filterSidebar.classList.add('filter-close');
+
+        setTimeout(() => {
+            filterSidebar.classList.remove('active');
+            filterSidebar.classList.remove('filter-close');
+            displayPlayerData();
+        }, 700);
+    }
+
+    const filterDragHandle = document.getElementById('filterDragHandle');
+    const filterResizer = document.getElementById('filterResizer');
+
+    if (filterDragHandle && filterSidebar) {
+        filterDragHandle.addEventListener('mousedown', function(e) {
+            if (e.target && e.target.id === 'closeFilter') return;
+
+            e.preventDefault();
+
+            const rect = filterSidebar.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const offsetY = e.clientY - rect.top;
+
+            function onMove(ev) {
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+
+                const newLeft = Math.max(0, Math.min(vw - rect.width, ev.clientX - offsetX));
+                const newTop  = Math.max(0, Math.min(vh - rect.height, ev.clientY - offsetY));
+
+                filterSidebar.style.left = newLeft + 'px';
+                filterSidebar.style.top  = newTop + 'px';
+            }
+
+            function onUp() {
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onUp);
+            }
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+        });
+    }
+
+    if (filterResizer && filterSidebar) {
+        filterResizer.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const rect = filterSidebar.getBoundingClientRect();
+            const startW = rect.width;
+            const startH = rect.height;
+            const startX = e.clientX;
+            const startY = e.clientY;
+
+            const MIN_W = 280;
+            const MIN_H = 220;
+
+            function onMove(ev) {
+                const dx = ev.clientX - startX;
+                const dy = ev.clientY - startY;
+
+                const maxW = window.innerWidth - rect.left;
+                const maxH = window.innerHeight - rect.top;
+
+                const newW = Math.max(MIN_W, Math.min(maxW, startW + dx));
+                const newH = Math.max(MIN_H, Math.min(maxH, startH + dy));
+
+                filterSidebar.style.width  = newW + 'px';
+                filterSidebar.style.height = newH + 'px';
+            }
+
+            function onUp() {
+                window.removeEventListener('mousemove', onMove);
+                window.removeEventListener('mouseup', onUp);
+            }
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+        });
     }
 
     if (filterBtn) filterBtn.addEventListener('click', toggleFilter);
@@ -887,7 +968,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 const profileModal = document.getElementById('profileModal');
 const profileIframe = document.getElementById('profileIframe');
-// SỬA: Chọn đúng nút đóng của profile modal (trong block #close-modal) thay vì lấy phần tử đầu tiên có class .iframe-close
 const profileCloseBtn = document.querySelector('#close-modal .iframe-close'); 
 const closemodal = document.getElementById('close-modal');
 
@@ -943,7 +1023,6 @@ function displayPlayerData() {
     const rankedBody = document.getElementById('rankedBody');
     const tableHeadRow = document.querySelector('#rankedTable thead tr');
     
-    // Xử lý Header Checkbox
     let existingCheckTh = tableHeadRow.querySelector('.checkbox-col');
     if (isFilterOpen) {
         if (!existingCheckTh) {
@@ -1207,7 +1286,6 @@ window.addEventListener('popstate', () => {
     const urlParams = new URLSearchParams(window.location.search);
     activeSeason = urlParams.get('season');
     
-    // Sync the selector UI
     const seasonSelect = document.getElementById('seasonSelect');
     if (seasonSelect) {
         if (!activeSeason) {
@@ -1342,9 +1420,9 @@ window.onclick = function(event) {
     modal.classList.add('modal-exit2');
     modal2.classList.add('modal-exit');
     setTimeout(function() {
-      modal.style.display = 'none';
-      modal.classList.remove('modal-exit2');
-      modal2.classList.remove('modal-exit');
+        modal.style.display = 'none';
+        modal.classList.remove('modal-exit2');
+        modal2.classList.remove('modal-exit');
     }, 500);
   }
 }
@@ -1475,30 +1553,3 @@ function checkFilterPass(player) {
 
     return true;
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    var champModal = document.getElementById("championshipModal");
-    var champBtn = document.getElementById("championshipBtn");
-    var champClose = document.getElementsByClassName("close-champ")[0];
-
-    // Khi bấm nút Championship thì mở Modal
-    if (champBtn) {
-        champBtn.onclick = function() {
-            champModal.style.display = "flex";
-        }
-    }
-
-    // Khi bấm nút X thì đóng Modal
-    if (champClose) {
-        champClose.onclick = function() {
-            champModal.style.display = "none";
-        }
-    }
-
-    // Khi bấm ra ngoài vùng trắng thì đóng Modal (dùng chung logic đóng modal)
-    window.addEventListener('click', function(event) {
-        if (event.target == champModal) {
-            champModal.style.display = "none";
-        }
-    });
-});

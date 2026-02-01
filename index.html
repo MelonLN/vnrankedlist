@@ -50,7 +50,7 @@
             <div class="button-container">
                 <button id="Sub">Subscribe</button>
                 <button id="filterBtn">Filter</button>
-                <button id="championshipBtn">Championship</button>
+                <button onclick="window.location.href='championship.html'" id="championshipBtn">Championship</button>
                 <button id="downloadButton">Download Table</button>
             </div>
         </div>
@@ -123,57 +123,6 @@
             </thead>
             <tbody id="rankedBody"></tbody>
         </table>
-        <aside id="filterSidebar" class="filter-sidebar">
-            <div class="filter-header">
-                <h3>Filter Options</h3>
-                <span id="closeFilter" class="iframe-close">×</span>
-            </div>
-            <div class="filter-content">
-                <div class="filter-group">
-                    <label>Elo Range:</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minElo" placeholder="Min">
-                        <input type="number" id="maxElo" placeholder="Max">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Best Time (mm:ss):</label>
-                    <div class="range-inputs">
-                        <input type="text" id="minTime" placeholder="Min">
-                        <input type="text" id="maxTime" placeholder="Max">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Avg Time (mm:ss):</label>
-                    <div class="range-inputs">
-                        <input type="text" id="minAvg" placeholder="Min">
-                        <input type="text" id="maxAvg" placeholder="Max">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Win Rate (%):</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minWin" placeholder="0">
-                        <input type="number" id="maxWin" placeholder="100">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>FF Rate (%):</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minFF" placeholder="0">
-                        <input type="number" id="maxFF" placeholder="100">
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button id="resetFilters">Reset All</button>
-                </div>
-            </div>
-        </aside>
         <div id="loading-contai">
             <canvas id="loadingCanvas" class="image-pixelated" width="21" height="21"></canvas>
         </div>
@@ -196,6 +145,58 @@
                 allowfullscreen>
             </iframe>
         </div>
+    </aside>
+    <aside id="filterSidebar" class="filter-window">
+        <div class="filter-header" id="filterDragHandle">
+            <h3>Filter Options</h3>
+            <span id="closeFilter" class="iframe-close">×</span>
+        </div>
+        <div class="filter-content">
+            <div class="filter-group">
+                <label>Elo Range:</label>
+                <div class="range-inputs">
+                    <input type="number" id="minElo" placeholder="Min">
+                    <input type="number" id="maxElo" placeholder="Max">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Best Time (mm:ss):</label>
+                <div class="range-inputs">
+                    <input type="text" id="minTime" placeholder="Min">
+                    <input type="text" id="maxTime" placeholder="Max">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Avg Time (mm:ss):</label>
+                <div class="range-inputs">
+                    <input type="text" id="minAvg" placeholder="Min">
+                    <input type="text" id="maxAvg" placeholder="Max">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>Win Rate (%):</label>
+                <div class="range-inputs">
+                    <input type="number" id="minWin" placeholder="0">
+                    <input type="number" id="maxWin" placeholder="100">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>FF Rate (%):</label>
+                <div class="range-inputs">
+                    <input type="number" id="minFF" placeholder="0">
+                    <input type="number" id="maxFF" placeholder="100">
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button id="resetFilters">Reset All</button>
+            </div>
+        </div>
+        <div class="filter-resizer" id="filterResizer"></div>
     </aside>
     <svg style="display:none" aria-hidden="true">
         <symbol id="sort-arrow"
@@ -239,20 +240,6 @@
                 <rect x="176" y="80" width="16" height="16" fill="#ffffff"/> 
         </symbol>
     </svg>
-    <div id="championshipModal" class="modal">
-        <div class="modal-content" style="width: 90%; max-width: 850px; text-align: center;">
-            <span class="close-champ" style="float: right; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa;">&times;</span>
-            <h2 style="margin-top: 0; color: #ffffff;">VNMCSR Championship</h2>
-            
-            <div style="margin: 20px 0;">
-                <iframe src="https://challonge.com/canhvjpplayoff/module" width="100%" height="600" frameborder="0" scrolling="auto" allowtransparency="true"></iframe>
-            </div>
-
-            <a href="https://www.youtube.com/@canhvjp/live" target="_blank" class="live-btn">
-                📺 WATCH LIVE
-            </a>
-        </div>
-    </div>
     <script src="vnranked.js" defer></script>
 </body>
 </html>

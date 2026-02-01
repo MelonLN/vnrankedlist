@@ -472,8 +472,6 @@ h1 {
 }
 
 #Sub:hover,
-#btsm:hover,
-#search:hover,
 #downloadButton:hover,
 #championshipBtn:hover,
 #filterBtn:hover {
@@ -484,6 +482,20 @@ h1 {
   top: -2px;
   box-shadow: 0 6px 0 #000;
 } 
+
+#btsm:hover{
+  cursor: pointer;
+  background-color: #1f454b;
+  animation: animation 0.4s;
+  border-color: #87ce34;
+  top: -2px;
+  box-shadow: 4px 6px 0 #0c2124; 
+}
+#search:hover{
+  cursor: pointer;
+  background-color: #1f454b;
+  animation: animation 0.4s;
+}
 
 #Sub:active,
 #downloadButton:active,
@@ -584,7 +596,6 @@ footer{
   height: 100%;
   overflow: auto;
   margin: auto;
-  /* padding-top: 1.5%; */
   background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.4);
   animation-name: fadeIn;
@@ -618,6 +629,7 @@ footer{
   font-family: 'Ranked', monospace;
 }
 
+.close-champ:hover,
 .iframe-close:hover,
 .iframe-close:focus,
 .close:hover,
@@ -645,6 +657,10 @@ footer{
   width: 100px;
   text-align: center;
   font-family: "Mcfont", monospace;
+  border: 2px solid #555;
+  box-shadow: 3px 4px 0 #0c2124;
+  transition: all 0.2s ease;
+  top: 0;
 }
 
 input{
@@ -795,19 +811,19 @@ input{
   display: none;
   max-height: 240px;
   overflow: auto;
-  z-index: 9999;
-  transform-origin: top;  
+  z-index: 998;
+    transform-origin: top;  
   animation: dropdownOpen 0.3s ease forwards;
 }
 
 @keyframes dropdownOpen{
-  from { height: 0px; opacity: 1; }
-  to   { height: 240px; opacity: 1; }
+  from { height: 0px;}
+  to   { height: 240px;}
 }
 
 @keyframes dropdownClose{
-  from { height: 240px; opacity: 1; }
-  to   { height: 0px; opacity: 1; }
+  from { height: 240px;}
+  to   { height: 0px;}
 }
 
 
@@ -831,13 +847,11 @@ input{
   animation: none;
 }
 
-/* option đang chọn */
 .pixel-select__opt.is-selected{
   background: #ffffff;
   color: #0c2124;
 }
 
-/* ẩn select native nhưng vẫn để JS của bạn dùng */
 .pixel-select__native{
   position: absolute;
   opacity: 0;
@@ -845,7 +859,6 @@ input{
   width: 0;
   height: 0;
 }
-
 
 .season-header {
   gap: 10px;
@@ -1029,6 +1042,7 @@ main {
   cursor: pointer;
   z-index: 10;
   border: none;
+  font-weight: bold;
   line-height: 1;
   font-family: 'Ranked', monospace;
 }
@@ -1063,7 +1077,7 @@ main {
     left: 0;                   
     top: 0;
     cursor: col-resize;        
-    z-index: 999;              
+    z-index: 998;              
 }
 
 .resizer:hover {
@@ -1079,28 +1093,106 @@ main {
     pointer-events: none;      
 }
 
-/* --- SIDEBAR & CHECKBOX STYLES --- */
-
-/* Sidebar Styles */
-.filter-sidebar {
-    position: fixed;
-    top: 0;
-    right: -320px; /* Ẩn bên phải */
-    width: 300px;
-    height: 100%;
-    background: #1e1e1e; /* Màu nền tối */
-    box-shadow: -2px 0 5px rgba(0,0,0,0.5);
-    transition: right 0.3s ease;
-    z-index: 1001; /* Cao hơn các thành phần khác */
-    display: flex;
-    flex-direction: column;
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    border-left: 1px solid #444;
+/* filter */
+#filterSidebar.filter-window{
+  position: fixed;
+  top: 120px;
+  left: 30px;
+  width: 360px;
+  height: 520px;
+  background: #102c30;
+  color: #fff;
+  border: 2px solid #ffffff;
+  box-shadow: 6px 6px 0 #00000074;
+  z-index: 999;
+  display: none;            
+  overflow: hidden;
+  font-family: "Mcfont", monospace;
+  animation: filterPop 0.7s ease;
+  transform-origin: top left;
 }
 
-.filter-sidebar.active {
-    right: 0; /* Hiện ra */
+#filterSidebar.filter-window.active{
+  display: flex;
+  flex-direction: column;
+}
+
+#filterSidebar.filter-close{
+  animation: filterClose 0.7s ease;
+}
+
+@keyframes filterPop {
+  0% {
+    opacity: 0;
+    transform: translateX(6px) translateY(6px);
+    box-shadow: 0 0 0 #00000000;
+  }
+  30%{
+    opacity: 1;
+    box-shadow: 12px 12px 0 #00000000;
+  }
+  80% {
+    transform: translateX(0) translateY(0);
+    
+  }
+  100% {
+    box-shadow: 6px 6px 0 #00000074;
+  }
+}
+
+@keyframes filterClose {
+  0% {
+    height: 1;
+  }
+  100% {
+    height: 0;
+  }
+}
+
+#filterSidebar .filter-header{
+  background: #14373c;
+  border-bottom: 2px solid #0c2124;
+  padding: 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: move;
+  user-select: none;
+}
+
+#filterSidebar .filter-header .iframe-close{
+  position: static !important;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+#filterSidebar .filter-content{
+  padding: 14px;
+  overflow: auto;
+  flex: 1 1 auto;
+}
+
+#filterSidebar .filter-resizer{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 50%, rgb(255, 255, 255) 50%);
+  border-left: 2px solid rgb(255, 255, 255);
+  border-top: 2px solid rgb(255, 255, 255);
+}
+
+.filter-window.dragging,
+.filter-window.resizing{
+  user-select: none;
+}
+
+#filterSidebar .filter-content::-webkit-scrollbar{
+  display: none;
 }
 
 .filter-header {
@@ -1108,13 +1200,12 @@ main {
     background: #252526;
     border-bottom: 1px solid #3e3e42;
     display: flex;
-    justify-content: space-between; /* Fix lỗi chữ bị đè */
+    justify-content: space-between;
     align-items: center;
 }
 
-/* Fix nút Close bị đè do style global .iframe-close có position: absolute */
 .filter-header .iframe-close {
-    position: static !important;
+    position: static;
     text-align: right;
     width: auto;
 }
@@ -1131,7 +1222,7 @@ main {
 .filter-group label {
     display: block;
     margin-bottom: 5px;
-    font-size: 14px;
+    font-size: 18px;
     color: #ccc;
 }
 
@@ -1143,24 +1234,30 @@ main {
 .range-inputs input {
     width: 100%;
     padding: 5px;
-    background: #333;
-    border: 1px solid #555;
+    background: #0c2124;
     color: white;
-    border-radius: 4px;
 }
 
 .filter-actions button {
     width: 100%;
     padding: 8px;
-    background: #d9534f;
+    background: #c9302c;
+    font-family: "Mcfont", monospace;
     color: white;
     border: none;
     cursor: pointer;
-    border-radius: 4px;
+    border: 2px solid #7a4343;
+    box-shadow: 0 4px 0 #000;
+    transition: all 0.2s ease;
+    top: 0;
+    font-size: 18px;
 }
 
 .filter-actions button:hover {
-    background: #c9302c;
+    background: #a7332f;
+    border-color: #ffffff;
+    top: -2px;
+    box-shadow: 0 6px 0 #000;
 }
 
 th.checkbox-col, td.checkbox-col {
@@ -1178,6 +1275,7 @@ input[type="checkbox"].filter-check {
     accent-color: #87ce34;
 }
 
+/* live */
 .live-btn {
     display: inline-block;
     background-color: #ff0000;
@@ -1185,10 +1283,8 @@ input[type="checkbox"].filter-check {
     padding: 10px 20px;
     text-decoration: none;
     font-weight: bold;
-    border-radius: 0px;
     font-size: 18px;
     transition: all 0.2s;
-    margin-bottom: 10px;
     font-family: "Mcfont", monospace;
     border: 2px solid #555;
     box-shadow: 0 4px 0 #000;
@@ -1199,7 +1295,7 @@ input[type="checkbox"].filter-check {
     border-color: #fff;
     transform: translateY(-2px);
     box-shadow: 0 6px 0 #000;
-}
+} 
 
 .live-btn:active {
     transform: translateY(2px);
@@ -1207,18 +1303,18 @@ input[type="checkbox"].filter-check {
 }
 
 .close-champ {
-    color: #fff;
-    opacity: 0.8;
+    color: #ffffff;
     transition: opacity 0.2s;
-}
-.close-champ:hover {
-    color: #ff5555;
-    opacity: 1;
+    font-family: 'Ranked', monospace;
+    cursor: pointer;
+    float: right; 
+    font-size: 20px;
+    font-weight: bold; 
 }
 
 #championshipModal .champ-content {
-    padding: 0 !important;
-    width: 850px !important; 
+    padding: 0;
+    width: 850px; 
     max-width: 95vw;
     background-color: transparent;
     border: 2px solid #fff;
@@ -1227,11 +1323,17 @@ input[type="checkbox"].filter-check {
     flex-direction: column;
 }
 
+.iframe{
+    margin: 20px;
+}
+
 #championshipModal iframe {
     display: block;
     width: 100%;
+    height: 75vh;
 }
 
+/* phone */
 @media (max-width: 1023px) {
   .iframe-modal {
     border-radius: 0px;
