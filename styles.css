@@ -451,7 +451,8 @@ h1 {
 #Sub,
 #downloadButton,
 #championshipBtn,
-#filterBtn {
+#filterBtn,
+#btsm {
   cursor: pointer;
   align-items: center;
   justify-content: center;

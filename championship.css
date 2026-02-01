@@ -1,45 +1,7 @@
-.mode {
-    display: flex;
-    margin-top: 2px;
-    padding: 0 18px;
-    align-items: center;
-    background-color: #102c30;
-    height: 60px;
-    color: #fff;
-    position: relative;
-    font-family: 'Mcfont', monospace;
-    border-bottom: 2px solid #1f454b;
-}
-
-.season-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-right: auto;
-}
-
 #tt {
     font-size: 24px;
     text-transform: uppercase;
     letter-spacing: 1px;
-}
-
-.button-container {
-    display: flex;
-    gap: 10px;
-}
-
-#championshipBtn {
-    cursor: pointer;
-    background-color: #0c2124;
-    color: #fff;
-    font-size: 14px;
-    height: 36px;
-    width: 140px;
-    font-family: "mcfont", monospace;
-    border: 2px solid #555;
-    box-shadow: 0 3px 0 #000;
-    transition: all 0.2s ease;
 }
 
 #championshipBtn:hover {
