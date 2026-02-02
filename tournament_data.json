@@ -82,10 +82,10 @@
           "title": "TỨ KẾT",
           "type": "bracket",
           "matches": [
-            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
-            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
-            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
-            { "seed1": 0, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 }
+            { "seed1": 1, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 4, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 2, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 },
+            { "seed1": 3, "s1": 0, "seed2": 0, "s2": 0, "winner": 0 }
           ]
         },
         {
