@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const li = document.createElement('li');
             li.className = 'pixel-select__opt';
             if (s.id === activeSeasonId) li.classList.add('is-selected');
-            li.textContent = `Season ${s.name || s.id}`;
+            li.textContent = `${s.name || s.id}`;
             
             li.onclick = (e) => {
                 e.stopPropagation();
