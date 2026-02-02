@@ -473,7 +473,6 @@ async function fetchDataUser(event) {
         const data = userDataS.data;
         let { nickname, eloRate, eloRank, uuid, country } = data;
 
-        // If viewing past season, check seasonResult for accurate data
         if (activeSeason && data.seasonResult && data.seasonResult.last) {
             eloRate = data.seasonResult.last.eloRate || eloRate;
             eloRank = data.seasonResult.last.eloRank || eloRank;
@@ -1086,8 +1085,28 @@ function displayPlayerData() {
         }
 
         const rankCell = row.insertCell();
-        rankCell.textContent = displayIndex++;
         rankCell.style.textAlign = 'center';
+
+        const isFilteredRank = isAnyFilterActive();
+        const isTop3 = displayIndex <= 3;
+
+        const rankNumber = displayIndex++;
+
+        let starHTML = '';
+        if (isTop3) {
+            starHTML = `<span class="rank-star" style="color: gold; font-size: 14px;">★</span> `;
+        }
+        rankCell.innerHTML = `
+            ${starHTML}
+            <span class="rank-number">${rankNumber}</span>
+        `;
+
+        if (isFilteredRank) {
+            const rankNumEl = rankCell.querySelector('.rank-number');
+            if (rankNumEl) {
+                rankNumEl.style.color = '#87ce34';
+            }
+        }
 
         const nameCell = row.insertCell();
         nameCell.style.textAlign = 'left';
@@ -1553,3 +1572,24 @@ function checkFilterPass(player) {
 
     return true;
 }
+
+function isAnyFilterActive() {
+    const hasNumericFilter = Object.values(filterValues).some(v => v !== null);
+    const hasHiddenPlayers = hiddenUUIDs.size > 0;
+
+    return hasNumericFilter || hasHiddenPlayers;
+}
+
+const moreBtn = document.getElementById("moreBtn");
+const moreMenu = document.getElementById("moreMenu");
+
+moreBtn.addEventListener("click", () => {
+    moreMenu.style.display =
+        moreMenu.style.display === "block" ? "none" : "block";
+});
+
+document.addEventListener("click", (e) => {
+    if (!e.target.closest(".more-container")) {
+        moreMenu.style.display = "none";
+    }
+});

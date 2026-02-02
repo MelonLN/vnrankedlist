@@ -64,43 +64,76 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function initSeasonPicker(activeSeasonId) {
-        const btn = seasonSelectUI.querySelector('.pixel-select__btn');
-        const valEl = seasonSelectUI.querySelector('.pixel-select__value');
-        const list = seasonSelectUI.querySelector('.pixel-select__list');
+        const root = seasonSelectUI;
+        const btn = root.querySelector('.pixel-select__btn');
+        const valEl = root.querySelector('.pixel-select__value');
+        const list = root.querySelector('.pixel-select__list');
 
         list.innerHTML = '';
-        
+
         const displayOrder = [...allSeasonsData].reverse();
 
+        /* ====== EFFECT LOGIC (từ mã 1) ====== */
+        const close = () => {
+            if (!root.classList.contains('is-open')) return;
+
+            list.classList.add('exit');
+            btn.setAttribute('aria-expanded', 'false');
+
+            const onEnd = (ev) => {
+                if (ev.target !== list) return;
+                list.classList.remove('exit');
+                root.classList.remove('is-open');
+                list.removeEventListener('animationend', onEnd);
+            };
+
+            list.addEventListener('animationend', onEnd);
+        };
+
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            const open = !root.classList.contains('is-open');
+
+            if (open) {
+                list.classList.remove('exit');
+                root.classList.add('is-open');
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                close();
+            }
+        };
+
+        document.addEventListener('click', (e) => {
+            if (!root.contains(e.target)) close();
+        }, { capture: true });
+
+        /* ====== BUSINESS LOGIC (mã 2) ====== */
         displayOrder.forEach((s) => {
             const li = document.createElement('li');
             li.className = 'pixel-select__opt';
             if (s.id === activeSeasonId) li.classList.add('is-selected');
-            li.textContent = `${s.name || s.id}`;
-            
+            li.textContent = s.name || s.id;
+
             li.onclick = (e) => {
                 e.stopPropagation();
+
                 valEl.textContent = s.name || s.id;
-                seasonSelectUI.querySelectorAll('.pixel-select__opt').forEach(opt => opt.classList.remove('is-selected'));
+                root.querySelectorAll('.pixel-select__opt')
+                    .forEach(opt => opt.classList.remove('is-selected'));
                 li.classList.add('is-selected');
-                seasonSelectUI.classList.remove('is-open');
-                
+
                 updateUrl(s.id);
                 currentSeasonId = s.id;
                 renderSeason(s);
+
+                close(); // đóng có animation
             };
+
             list.appendChild(li);
         });
 
         const currentActive = allSeasonsData.find(s => s.id === activeSeasonId);
         valEl.textContent = currentActive ? (currentActive.name || currentActive.id) : activeSeasonId;
-        
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            seasonSelectUI.classList.toggle('is-open');
-        };
-        
-        document.addEventListener('click', () => seasonSelectUI.classList.remove('is-open'));
     }
 
     function getPlayerData(participants, seed) {

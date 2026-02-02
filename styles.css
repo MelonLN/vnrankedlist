@@ -448,17 +448,16 @@ h1 {
   position: absolute;
 }
 
+#moreBtn,
 #Sub,
 #downloadButton,
 #championshipBtn,
-#filterBtn,
-#btsm {
+#filterBtn {
   cursor: pointer;
   align-items: center;
   justify-content: center;
   display: flex;
   background-color: #0c2124;
-  border: 0px solid #8f2f6400;
   color: #fff;
   border-radius: 0px;
   font-size: 20px;
@@ -472,6 +471,7 @@ h1 {
   top: 0;
 }
 
+#moreBtn:hover,
 #Sub:hover,
 #downloadButton:hover,
 #championshipBtn:hover,
@@ -482,7 +482,23 @@ h1 {
   border-color: #87ce34;
   top: -2px;
   box-shadow: 0 6px 0 #000;
+  transform: translateY(-1px);
+  color: #87ce34;
 } 
+
+#moreBtn:active,
+#Sub:active,
+#downloadButton:active,
+#championshipBtn:active,
+#filterBtn:active {
+  cursor: pointer;
+  background-color: #1f454b;
+  animation: animation 0.4s;
+  border-color: #87ce34;
+  color: #87ce34;
+  transform: translateY(2px);
+  box-shadow: 0 6px 0 #000;
+}
 
 #btsm:hover{
   cursor: pointer;
@@ -490,8 +506,21 @@ h1 {
   animation: animation 0.4s;
   border-color: #87ce34;
   top: -2px;
-  box-shadow: 4px 6px 0 #0c2124; 
+  box-shadow: 5px 7px 0 #0c2124; 
+  transform: translateY(-1px);
+  color: #87ce34;
 }
+
+#btsm:active{
+  cursor: pointer;
+  background-color: #1f454b;
+  animation: animation 0.4s;
+  border-color: #87ce34;
+  color: #87ce34;
+  transform: translateX(2px) translateY(2px);
+  box-shadow: 0 0 0 #0c2124;
+}
+
 #search:hover{
   cursor: pointer;
   background-color: #1f454b;
@@ -744,11 +773,13 @@ input{
 
 .pixel-select__btn{
   display: inline-flex;
+  border: none;
+  box-shadow: 0 0 0 2px #555, 0 5px 0 0 #000;
+  /* box-shadow: 0 3px 0 #000; */
   align-items: center;
   gap: 10px;
   background: #0c2124;
   color: #fff;
-  border: 0;
   padding: 6px 12px;
   cursor: pointer;
   line-height: 0.9;
@@ -762,15 +793,18 @@ input{
 }
 
 .pixel-select__btn:hover{
+  box-shadow: 0 0 0 2px #ffffff, 0 5px 0 0 #000;
   background: #1f454b;
   animation: animation 0.4s;
 }
 
 .pixel-select__btn:focus{
+  /* border: none; */
   outline: none;
 }
 
 .pixel-select__btn:focus-visible{
+  /* border: none; */
   outline: none;
   box-shadow: 0 0 0 3px #ffffff, 4px 4px 0 0 #000;
 }
@@ -813,7 +847,7 @@ input{
   max-height: 240px;
   overflow: auto;
   z-index: 998;
-    transform-origin: top;  
+  transform-origin: top;  
   animation: dropdownOpen 0.3s ease forwards;
 }
 
@@ -1043,7 +1077,6 @@ main {
   cursor: pointer;
   z-index: 10;
   border: none;
-  font-weight: bold;
   line-height: 1;
   font-family: 'Ranked', monospace;
 }
@@ -1259,6 +1292,15 @@ main {
     border-color: #ffffff;
     top: -2px;
     box-shadow: 0 6px 0 #000;
+    transform: translateY(-2px);
+}
+
+.filter-actions button:active {
+    background: #a7332f;
+    border-color: #ffffff;
+    top: 2px;
+    box-shadow: 0 0 0 #000;
+    transform: translateY(2px);
 }
 
 th.checkbox-col, td.checkbox-col {
@@ -1449,4 +1491,40 @@ input[type="checkbox"].filter-check {
 ::selection {
   background: #87ce34;
   color: #0c2124;
+}
+
+
+.more-menu #filterBtn,
+.more-menu #downloadButton{
+  box-shadow: 0 0px 0 #000;
+}
+
+.more-menu #filterBtn:hover,
+.more-menu #downloadButton:hover {
+  box-shadow: 0 0px 0 #000;
+}
+
+.more-menu #filterBtn:active,
+.more-menu #downloadButton:active {
+  box-shadow: 0 0px 0 #000;
+}
+
+#moreBtn {
+    font-size: 18px;
+    cursor: pointer;
+    width: 35px;
+}
+
+.more-container {
+  position: relative;
+}
+
+.more-menu {
+  display: none;
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background-color: #0c2124;
+  box-shadow: 0 4px 0 #000;
+  z-index: 100;
 }

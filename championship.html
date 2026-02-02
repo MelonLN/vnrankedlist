@@ -31,15 +31,17 @@
         </div>
 
         <div class="mode">
-            <div class="season-header">
+           <div class="season-header">
                 <span id="tt">Season </span>
                 <div class="pixel-select" id="seasonSelectUI">
                     <button type="button" class="pixel-select__btn" aria-haspopup="listbox" aria-expanded="false">
                         <span class="pixel-select__value">—</span>
                         <span class="pixel-select__arrow" aria-hidden="true"></span>
                     </button>
+
                     <ul class="pixel-select__list" role="listbox"></ul>
-                    <select id="seasonSelect" class="pixel-select__native" style="display:none"></select>
+
+                    <select id="seasonSelect" class="pixel-select__native"></select>
                 </div>
             </div>
             <div class="button-container">
@@ -52,10 +54,15 @@
                 <span class="live-at-text">Live at:</span>
                 <a href="https://www.youtube.com/@canhvjp/live" target="_blank" class="live-btn-header">
                     <div class="yt-top-row">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="yt-logo" alt="YT">
-                        <span class="yt-text">YouTube</span>
+                        <svg id="timeArrow"width="20" height="20">
+                            <use href="#sort-arrow"></use>
+                        </svg>
+                        <div>
+                            <span class="yt-text">YouTube</span>
+                            <div class="yt-handle">@canhvjp</div>
+                        </div>
                     </div>
-                    <div class="yt-handle">@canhvjp</div>
+                    
                 </a>
             </div>
             <p class="discord-info">
@@ -77,4 +84,46 @@
     </main>
     <script src="championship.js" type="module" defer></script>
 </body>
+<svg style="display:none" aria-hidden="true">
+    <symbol id="sort-arrow"
+            viewBox="0 0 224 112"
+            shape-rendering="crispEdges">
+            <rect x="96" y="0"   width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="16"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="16"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="16" width="16" height="16" fill="#ffffff"/>
+            <rect x="64" y="32"  width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="32"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="32"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="32" width="16" height="16" fill="#ffffff"/>
+            <rect x="128" y="32" width="16" height="16" fill="#ffffff"/>
+            <rect x="48" y="48"  width="16" height="16" fill="#ffffff"/>
+            <rect x="64" y="48"  width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="48"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="48"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="48" width="16" height="16" fill="#ffffff"/>
+            <rect x="128" y="48" width="16" height="16" fill="#ffffff"/>
+            <rect x="144" y="48" width="16" height="16" fill="#ffffff"/>
+            <rect x="32" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="48" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="64" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="64"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="64" width="16" height="16" fill="#ffffff"/>
+            <rect x="128" y="64" width="16" height="16" fill="#ffffff"/>
+            <rect x="144" y="64" width="16" height="16" fill="#ffffff"/>
+            <rect x="160" y="64" width="16" height="16" fill="#ffffff"/>
+            <rect x="16" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="32" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="48" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="64" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="80" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="96" y="80"  width="16" height="16" fill="#ffffff"/>
+            <rect x="112" y="80" width="16" height="16" fill="#ffffff"/>
+            <rect x="128" y="80" width="16" height="16" fill="#ffffff"/>
+            <rect x="144" y="80" width="16" height="16" fill="#ffffff"/>
+            <rect x="160" y="80" width="16" height="16" fill="#ffffff"/>
+            <rect x="176" y="80" width="16" height="16" fill="#ffffff"/> 
+    </symbol>
+</svg>
 </html>
