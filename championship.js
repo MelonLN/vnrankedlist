@@ -1,8 +1,25 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC6nPZI4DYQmK4RT0Y31yen5e7BD8BOLek",
+    authDomain: "datavipvl.firebaseapp.com",
+    databaseURL: "https://datavipvl-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "datavipvl",
+    storageBucket: "datavipvl.firebasestorage.app",
+    messagingSenderId: "461205026579",
+    appId: "1:461205026579:web:3013f12894e180d9dc8ce6"
+};
+
+const app = initializeApp(firebaseConfig);  
+const db = getDatabase(app);
+
 document.addEventListener('DOMContentLoaded', function () {
     const bracketRoot = document.getElementById('bracket-root');
     const seasonSelectUI = document.getElementById('seasonSelectUI');
-    
+
     let allSeasonsData = [];
+    let currentSeasonId = null;
 
     function getSeasonFromUrl() {
         const params = new URLSearchParams(window.location.search);
@@ -15,31 +32,35 @@ document.addEventListener('DOMContentLoaded', function () {
         window.history.pushState({}, '', url);
     }
 
-    async function loadData() {
-        try {
-            const response = await fetch('tournament_data.json');
-            const data = await response.json();
+    function loadData() {
+        const dbRef = ref(db, '/'); 
+
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (!data || !data.seasons) {
+                bracketRoot.innerHTML = '<div class="loading-text">Không tìm thấy dữ liệu giải đấu.</div>';
+                return;
+            }
+
             allSeasonsData = data.seasons;
             
-            if (allSeasonsData.length > 0) {
-                const urlSeasonId = getSeasonFromUrl();
-                let seasonToRender;
+            const urlSeasonId = getSeasonFromUrl();
+            let seasonToRender = urlSeasonId ? allSeasonsData.find(s => s.id === urlSeasonId) : null;
 
-                if (urlSeasonId) {
-                    seasonToRender = allSeasonsData.find(s => s.id === urlSeasonId);
-                }
-
-                if (!seasonToRender) {
-                    seasonToRender = allSeasonsData[allSeasonsData.length - 1];
-                }
-
-                initSeasonPicker(seasonToRender.id);
-                renderSeason(seasonToRender);
+            if (!seasonToRender) {
+                seasonToRender = allSeasonsData[allSeasonsData.length - 1];
             }
-        } catch (e) {
-            console.error(e);
-            bracketRoot.innerHTML = '<div class="loading-text">Lỗi tải dữ liệu giải đấu.</div>';
-        }
+
+            currentSeasonId = seasonToRender.id;
+            
+            initSeasonPicker(currentSeasonId);
+            renderSeason(seasonToRender);
+            
+            console.log("Dữ liệu đã cập nhật Live từ Firebase!");
+        }, (error) => {
+            console.error("Firebase Error:", error);
+            bracketRoot.innerHTML = '<div class="loading-text">Lỗi kết nối database trực tiếp. Hãy kiểm tra Rules.</div>';
+        });
     }
 
     function initSeasonPicker(activeSeasonId) {
@@ -55,22 +76,24 @@ document.addEventListener('DOMContentLoaded', function () {
             const li = document.createElement('li');
             li.className = 'pixel-select__opt';
             if (s.id === activeSeasonId) li.classList.add('is-selected');
-            li.textContent = s.name || `Season ${s.id}`;
+            li.textContent = `Season ${s.name || s.id}`;
             
-            li.onclick = () => {
-                valEl.textContent = s.id;
+            li.onclick = (e) => {
+                e.stopPropagation();
+                valEl.textContent = s.name || s.id;
                 seasonSelectUI.querySelectorAll('.pixel-select__opt').forEach(opt => opt.classList.remove('is-selected'));
                 li.classList.add('is-selected');
-                
                 seasonSelectUI.classList.remove('is-open');
                 
                 updateUrl(s.id);
+                currentSeasonId = s.id;
                 renderSeason(s);
             };
             list.appendChild(li);
         });
 
-        valEl.textContent = activeSeasonId;
+        const currentActive = allSeasonsData.find(s => s.id === activeSeasonId);
+        valEl.textContent = currentActive ? (currentActive.name || currentActive.id) : activeSeasonId;
         
         btn.onclick = (e) => {
             e.stopPropagation();
@@ -114,17 +137,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (round.link) {
                     listDiv.classList.add('has-link');
-                    listDiv.title = "Bấm để xem video Vòng Sơ Loại";
                     listDiv.onclick = () => window.open(round.link, '_blank');
                 }
 
                 const header = document.createElement('div');
                 header.className = 'qualifier-header';
                 header.innerHTML = `
-                    <div>#</div>
-                    <div>Seed</div>
-                    <div style="text-align:left; padding-left:15px">Player</div>
-                    <div>Points</div>
+                    <div>#</div><div>Seed</div><div style="text-align:left; padding-left:15px">Player</div><div>Pts</div>
                 `;
                 listDiv.appendChild(header);
 
@@ -143,7 +162,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     listDiv.appendChild(item);
                 });
                 matchesWrapper.appendChild(listDiv);
-            } else {
+            } 
+
+            else {
                 round.matches.forEach((m) => {
                     const p1 = getPlayerData(participants, m.seed1);
                     const p2 = getPlayerData(participants, m.seed2);
@@ -153,7 +174,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     if (m.link) {
                         card.classList.add('has-link');
-                        card.setAttribute('title', 'Bấm để xem lại trận đấu');
                         card.onclick = (e) => {
                             e.stopPropagation();
                             window.open(m.link, '_blank');
@@ -162,18 +182,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if(m.type) card.innerHTML += `<div class="match-type-label">${m.type}</div>`;
 
-                    const t1Class = m.winner === 1 ? 'is-winner' : '';
-                    const t2Class = m.winner === 2 ? 'is-winner' : '';
+                    const t1Winner = m.winner === 1 ? 'is-winner' : '';
+                    const t2Winner = m.winner === 2 ? 'is-winner' : '';
 
                     card.innerHTML += `
-                        <div class="match-team ${t1Class}" data-player-seed="${m.seed1}">
+                        <div class="match-team ${t1Winner}" data-player-seed="${m.seed1}">
                             <div class="team-info">
                                 <span class="seed-tag">${m.seed1 || ''}</span>
                                 <span class="team-name">${p1.name}</span>
                             </div>
                             <span class="team-score">${m.s1}</span>
                         </div>
-                        <div class="match-team ${t2Class}" data-player-seed="${m.seed2}">
+                        <div class="match-team ${t2Winner}" data-player-seed="${m.seed2}">
                             <div class="team-info">
                                 <span class="seed-tag">${m.seed2 || ''}</span>
                                 <span class="team-name">${p2.name}</span>
@@ -183,8 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     `;
                     
                     card.querySelectorAll('.match-team').forEach(team => {
-                        const seed = team.getAttribute('data-player-seed');
-                        addHoverEvents(team, seed);
+                        addHoverEvents(team, team.getAttribute('data-player-seed'));
                     });
 
                     matchesWrapper.appendChild(card);
@@ -196,16 +215,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function addHoverEvents(el, seed) {
-        if (!seed || seed == 0) return;
+        if (!seed || seed == "0") return;
         el.addEventListener('mouseenter', () => {
             document.querySelectorAll(`[data-player-seed="${seed}"]`).forEach(node => {
                 node.classList.add('player-highlight');
-                if (node.classList.contains('match-team')) {
-                    node.closest('.match-card')?.classList.add('player-highlight');
-                }
-                if (node.classList.contains('qualifier-item')) {
-                    node.classList.add('player-highlight');
-                }
+                node.closest('.match-card')?.classList.add('player-highlight');
             });
         });
         el.addEventListener('mouseleave', () => {
