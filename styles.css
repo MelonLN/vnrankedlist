@@ -452,7 +452,10 @@ h1 {
 #Sub,
 #downloadButton,
 #championshipBtn,
-#filterBtn {
+#filterBtn,
+#filterBtnSr,
+#downloadBtnSr,
+#srccomBtn {
   cursor: pointer;
   align-items: center;
   justify-content: center;
@@ -475,7 +478,10 @@ h1 {
 #Sub:hover,
 #downloadButton:hover,
 #championshipBtn:hover,
-#filterBtn:hover {
+#filterBtn:hover,
+#filterBtnSr:hover,
+#downloadBtnSr:hover,
+#srccomBtn:hover {
   cursor: pointer;
   background-color: #1f454b;
   animation: animation 0.4s;
@@ -490,7 +496,10 @@ h1 {
 #Sub:active,
 #downloadButton:active,
 #championshipBtn:active,
-#filterBtn:active {
+#filterBtn:active,
+#filterBtnSr:active,
+#downloadBtnSr:active,
+#srccomBtn:active {
   cursor: pointer;
   background-color: #1f454b;
   animation: animation 0.4s;
@@ -1527,4 +1536,19 @@ input[type="checkbox"].filter-check {
   background-color: #0c2124;
   box-shadow: 0 4px 0 #000;
   z-index: 100;
+}
+
+.filter-select {
+    width: 100%;
+    margin-top: 10px;
+    background: #0b1a1c;
+    color: white;
+    border: 1px solid #87ce34;
+    padding: 8px;
+    font-family: 'Mcfont', sans-serif;
+    cursor: pointer;
+    outline: none;
+}
+.filter-select option {
+    background: #102c30;
 }
