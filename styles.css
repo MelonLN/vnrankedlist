@@ -75,39 +75,26 @@ th:nth-child(6):hover {
   background-color: #1f454b;
 }
 
-/* --- ĐỊNH NGHĨA WIDTH CỘT MẶC ĐỊNH (KHI TẮT FILTER) --- */
-th:nth-child(1), td:nth-child(1) { width: 4%; padding: 0px; } /* Rank (#) */
-th:nth-child(2), td:nth-child(2) { width: 30%; } /* Name */
-th:nth-child(3), td:nth-child(3) { width: 10%; } /* Elo */
-th:nth-child(4), td:nth-child(4) { width: 15%; } /* Best Time */
-th:nth-child(5), td:nth-child(5) { width: 15%; } /* Avg Time */
-th:nth-child(6), td:nth-child(6) { width: 11%; } /* Win Rate */
-th:nth-child(7), td:nth-child(7) { width: 11%; } /* FF Rate */
+th:nth-child(1), td:nth-child(1) { width: 4%; padding: 0px; }
+th:nth-child(2), td:nth-child(2) { width: 30%; }
+th:nth-child(3), td:nth-child(3) { width: 10%; }
+th:nth-child(4), td:nth-child(4) { width: 15%; }
+th:nth-child(5), td:nth-child(5) { width: 15%; }
+th:nth-child(6), td:nth-child(6) { width: 11%; }
+th:nth-child(7), td:nth-child(7) { width: 11%; }
 
-/* --- FIX WIDTH CỘT KHI BẬT FILTER (KHI CÓ CỘT CHECKBOX) --- */
-/* Sử dụng :has() để check nếu dòng có chứa class .checkbox-col thì áp dụng width mới */
-
-/* Cột 1 là Checkbox (đã style riêng ở dưới), các cột sau bị đẩy lùi 1 index */
-
-/* Cột 2 (Rank #) - Cần về lại 4% */
 tr:has(.checkbox-col) > *:nth-child(2) { width: 4% !important; }
 
-/* Cột 3 (Name) - Cần về lại 30% */
 tr:has(.checkbox-col) > *:nth-child(3) { width: 30% !important; }
 
-/* Cột 4 (Elo) - Cần về lại 10% */
 tr:has(.checkbox-col) > *:nth-child(4) { width: 10% !important; }
 
-/* Cột 5 (Best Time) - Cần về lại 15% */
 tr:has(.checkbox-col) > *:nth-child(5) { width: 15% !important; }
 
-/* Cột 6 (Avg Time) - Cần về lại 15% */
 tr:has(.checkbox-col) > *:nth-child(6) { width: 15% !important; }
 
-/* Cột 7 (Win Rate) - Cần về lại 11% */
 tr:has(.checkbox-col) > *:nth-child(7) { width: 11% !important; }
 
-/* Cột 8 (FF Rate) - Cần về lại 11% */
 tr:has(.checkbox-col) > *:nth-child(8) { width: 11% !important; }
 
 
@@ -455,7 +442,8 @@ h1 {
 #filterBtn,
 #filterBtnSr,
 #downloadBtnSr,
-#srccomBtn {
+#srccomBtn,
+#trailerBtn {
   cursor: pointer;
   align-items: center;
   justify-content: center;
@@ -481,7 +469,8 @@ h1 {
 #filterBtn:hover,
 #filterBtnSr:hover,
 #downloadBtnSr:hover,
-#srccomBtn:hover {
+#srccomBtn:hover,
+#trailerBtn:hover {
   cursor: pointer;
   background-color: #1f454b;
   animation: animation 0.4s;
@@ -499,7 +488,8 @@ h1 {
 #filterBtn:active,
 #filterBtnSr:active,
 #downloadBtnSr:active,
-#srccomBtn:active {
+#srccomBtn:active,
+#trailerBtn:active {
   cursor: pointer;
   background-color: #1f454b;
   animation: animation 0.4s;
