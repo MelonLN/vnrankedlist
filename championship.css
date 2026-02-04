@@ -46,11 +46,6 @@
     transform: rotate(90deg);
 } 
 
-.yt-logo {
-    width: 24px; 
-    height: auto;
-}
-
 .yt-text {
     font-size: 20px;
     font-weight: bold;
@@ -102,21 +97,6 @@
     overflow-x: hidden;
 }
 
-@media (max-width: 768px) {
-    .bracket-column {
-        flex: 1 1 100%;
-        max-width: none;
-        margin-bottom: 30px;
-    }
-    
-    .bracket-scroll-container {
-        padding: 10px;
-        gap: 15px;
-    }
-
-    #tt { font-size: 18px; }
-}
-
 .bracket-column {
     display: flex;
     flex-direction: column;
@@ -124,8 +104,6 @@
     max-width: 350px;
     margin-right: 0;
 }
-
-.bracket-column:last-child { margin-right: 0; }
 
 .round-title-node {
     text-align: center;
@@ -146,13 +124,38 @@
     flex: 1;
 }
 
+.round-semis .matches-wrapper {
+    justify-content: space-around;
+}
+
+.grand-final-card {
+    border: 2px solid #ffcc00 !important;
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.25);
+    z-index: 10;
+    width: 100%;
+    margin-bottom: 40px !important;
+}
+
+.grand-final-card:hover {
+    border: 2px solid #ff8f0e !important;
+}
+
+.round-finals .match-card:not(.grand-final-card) {
+    transform: scale(0.9);
+    opacity: 0.8;
+    width: 95%;
+    margin: 0 !important;
+    margin-bottom: 30px !important;
+}
+
 .match-card {
     background-color: #0c2124;
     border: 1px solid #2a3a3c;
-    margin-bottom: 25px;
+    margin-bottom: 50px; /* Tăng margin để nút không đè lên Round tiếp theo */
     position: relative;
     transition: transform 0.2s, box-shadow 0.2s;
     border-radius: 2px;
+    overflow: visible;
 }
 
 .match-card:hover {
@@ -192,7 +195,9 @@
     background-color: #0c2124;
     border: 1px solid #2a3a3c;
     border-radius: 4px;
-    overflow: hidden;
+    overflow: visible; /* Quan trọng để hiển thị nút tab bên ngoài border */
+    margin-bottom: 60px; /* Margin rộng hơn cho bảng danh sách dài */
+    position: relative;
 }
 
 .qualifier-header {
@@ -229,6 +234,45 @@
 .qualifier-seed { color: #556a6c; font-size: 12px; }
 .qualifier-name { text-align: left !important; padding-left: 15px !important; color: #fff; }
 .qualifier-points { color: #fff; font-size: 13px; background: rgba(0,0,0,0.2); }
+
+.watch-btn-tab {
+    position: absolute;
+    bottom: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #0c9200; 
+    border: 1px solid #000000;
+    border-top: none; 
+    padding: 4px 18px;
+    border-radius: 0 0 10px 10px; 
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    min-width: 110px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+}
+
+.watch-btn-tab span {
+    color: #000000;
+    font-family: "mcfont", monospace;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: lowercase;
+}
+
+.watch-btn-tab:hover {
+    background-color: #87ce34;
+    bottom: -28px;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.5);
+}
+
+.watch-btn-tab:active {
+    bottom: -24px;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
 
 .player-highlight {
     background-color: rgba(135, 206, 52, 0.15) !important;
@@ -269,75 +313,11 @@
     font-family: "mcfont", monospace;
 }
 
-/* .pixel-select__btn {
-    background: #0c2124; 
-    color: #fff; 
-    border: 2px solid #555;
-    padding: 6px 12px; 
-    cursor: pointer;
-    box-shadow: 0 3px 0 #000;
-} */
-
-/* .pixel-select__list {
-    background: #0c2124; 
-    border: 2px solid #555;
-    box-shadow: 5px 5px 0 #000;
-}
-
-.pixel-select__opt:hover { background: #1f454b; color: #87ce34; } */
-
-.qualifier-list.has-link {
-    cursor: pointer;
-    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-    position: relative;
-}
-
-.qualifier-list.has-link:hover {
-    border-color: #87ce34;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(135, 206, 52, 0.15);
-    background-color: #102c30;
-}
-
-.qualifier-list.has-link:hover::after {
-    content: "XEM VIDEO ▶";
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 10px;
-    color: #87ce34;
-    font-family: "mcfont", monospace;
-    letter-spacing: 1px;
-}
-
-.match-card.has-link {
-    cursor: pointer;
-    border-color: #4a6a6d;
-}
-
-.match-card.has-link:hover {
-    border-color: #87ce34;
-    background-color: #102c30;
-    box-shadow: 0 0 10px rgba(135, 206, 52, 0.2);
-}
-
-.match-card.has-link::after {
-    content: "▶";
-    position: absolute;
-    right: -15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #87ce34;
-    font-size: 10px;
-    opacity: 0.5;
-}
-
-.match-card.has-link:hover::after {
-    opacity: 1;
-}
-
 @media (max-width: 768px) {
-    .bracket-column { min-width: 220px; margin-right: 30px; }
+    .bracket-column { 
+        flex: 1 1 100%;
+        max-width: none;
+        margin-bottom: 60px;
+    }
     #tt { font-size: 18px; }
 }

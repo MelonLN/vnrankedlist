@@ -73,27 +73,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const displayOrder = [...allSeasonsData].reverse();
 
-        /* ====== EFFECT LOGIC (từ mã 1) ====== */
         const close = () => {
             if (!root.classList.contains('is-open')) return;
-
             list.classList.add('exit');
             btn.setAttribute('aria-expanded', 'false');
-
             const onEnd = (ev) => {
                 if (ev.target !== list) return;
                 list.classList.remove('exit');
                 root.classList.remove('is-open');
                 list.removeEventListener('animationend', onEnd);
             };
-
             list.addEventListener('animationend', onEnd);
         };
 
         btn.onclick = (e) => {
             e.stopPropagation();
             const open = !root.classList.contains('is-open');
-
             if (open) {
                 list.classList.remove('exit');
                 root.classList.add('is-open');
@@ -107,28 +102,21 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!root.contains(e.target)) close();
         }, { capture: true });
 
-        /* ====== BUSINESS LOGIC (mã 2) ====== */
         displayOrder.forEach((s) => {
             const li = document.createElement('li');
             li.className = 'pixel-select__opt';
             if (s.id === activeSeasonId) li.classList.add('is-selected');
             li.textContent = s.name || s.id;
-
             li.onclick = (e) => {
                 e.stopPropagation();
-
                 valEl.textContent = s.name || s.id;
-                root.querySelectorAll('.pixel-select__opt')
-                    .forEach(opt => opt.classList.remove('is-selected'));
+                root.querySelectorAll('.pixel-select__opt').forEach(opt => opt.classList.remove('is-selected'));
                 li.classList.add('is-selected');
-
                 updateUrl(s.id);
                 currentSeasonId = s.id;
                 renderSeason(s);
-
-                close(); // đóng có animation
+                close();
             };
-
             list.appendChild(li);
         });
 
@@ -139,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getPlayerData(participants, seed) {
         const s = String(seed);
         if (!participants || !participants[s]) {
-            return { name: "", points: 0, seed: seed };
+            return { name: "    ", points: 0, seed: seed };
         }
         return { 
             name: participants[s].name, 
@@ -155,6 +143,11 @@ document.addEventListener('DOMContentLoaded', function () {
         season.rounds.forEach((round) => {
             const column = document.createElement('div');
             column.className = 'bracket-column';
+            
+            // Thêm class đặc biệt dựa trên tiêu đề vòng đấu
+            const titleUpper = round.title.toUpperCase();
+            if (titleUpper.includes("BÁN KẾT")) column.classList.add('round-semis');
+            if (titleUpper.includes("CHUNG KẾT")) column.classList.add('round-finals');
 
             const title = document.createElement('div');
             title.className = 'round-title-node';
@@ -167,17 +160,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (round.type === 'list') {
                 const listDiv = document.createElement('div');
                 listDiv.className = 'qualifier-list';
-
-                if (round.link) {
-                    listDiv.classList.add('has-link');
-                    listDiv.onclick = () => window.open(round.link, '_blank');
-                }
-
                 const header = document.createElement('div');
                 header.className = 'qualifier-header';
-                header.innerHTML = `
-                    <div>#</div><div>Seed</div><div style="text-align:left; padding-left:15px">Player</div><div>Pts</div>
-                `;
+                header.innerHTML = `<div>#</div><div>Seed</div><div style="text-align:left; padding-left:15px">Player</div><div>Pts</div>`;
                 listDiv.appendChild(header);
 
                 round.seeds.forEach((seed, i) => {
@@ -194,9 +179,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     addHoverEvents(item, seed);
                     listDiv.appendChild(item);
                 });
+
+                if (round.link) {
+                    const watchBtn = document.createElement('div');
+                    watchBtn.className = 'watch-btn-tab';
+                    watchBtn.innerHTML = '<span>▶ watch</span>';
+                    watchBtn.onclick = () => window.open(round.link, '_blank');
+                    listDiv.appendChild(watchBtn);
+                }
                 matchesWrapper.appendChild(listDiv);
             } 
-
             else {
                 round.matches.forEach((m) => {
                     const p1 = getPlayerData(participants, m.seed1);
@@ -205,15 +197,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const card = document.createElement('div');
                     card.className = 'match-card';
                     
-                    if (m.link) {
-                        card.classList.add('has-link');
-                        card.onclick = (e) => {
-                            e.stopPropagation();
-                            window.open(m.link, '_blank');
-                        };
-                    }
-
-                    if(m.type) card.innerHTML += `<div class="match-type-label">${m.type}</div>`;
+                    // Highlight Grand Finals
+                    if (m.type === "Grand Finals") card.classList.add('grand-final-card');
+                    if (m.type) card.innerHTML += `<div class="match-type-label">${m.type}</div>`;
 
                     const t1Winner = m.winner === 1 ? 'is-winner' : '';
                     const t2Winner = m.winner === 2 ? 'is-winner' : '';
@@ -234,6 +220,17 @@ document.addEventListener('DOMContentLoaded', function () {
                             <span class="team-score">${m.s2}</span>
                         </div>
                     `;
+
+                    if (m.link) {
+                        const watchBtn = document.createElement('div');
+                        watchBtn.className = 'watch-btn-tab';
+                        watchBtn.innerHTML = '<span>▶ watch</span>';
+                        watchBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            window.open(m.link, '_blank');
+                        };
+                        card.appendChild(watchBtn);
+                    }
                     
                     card.querySelectorAll('.match-team').forEach(team => {
                         addHoverEvents(team, team.getAttribute('data-player-seed'));
