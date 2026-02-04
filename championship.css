@@ -151,7 +151,7 @@
 .match-card {
     background-color: #0c2124;
     border: 1px solid #2a3a3c;
-    margin-bottom: 50px; /* Tăng margin để nút không đè lên Round tiếp theo */
+    margin-bottom: 50px; 
     position: relative;
     transition: transform 0.2s, box-shadow 0.2s;
     border-radius: 2px;
@@ -195,8 +195,8 @@
     background-color: #0c2124;
     border: 1px solid #2a3a3c;
     border-radius: 4px;
-    overflow: visible; /* Quan trọng để hiển thị nút tab bên ngoài border */
-    margin-bottom: 60px; /* Margin rộng hơn cho bảng danh sách dài */
+    overflow: visible;
+    margin-bottom: 60px;
     position: relative;
 }
 

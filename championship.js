@@ -144,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const column = document.createElement('div');
             column.className = 'bracket-column';
             
-            // Thêm class đặc biệt dựa trên tiêu đề vòng đấu
             const titleUpper = round.title.toUpperCase();
             if (titleUpper.includes("BÁN KẾT")) column.classList.add('round-semis');
             if (titleUpper.includes("CHUNG KẾT")) column.classList.add('round-finals');
@@ -197,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     const card = document.createElement('div');
                     card.className = 'match-card';
                     
-                    // Highlight Grand Finals
                     if (m.type === "Grand Finals") card.classList.add('grand-final-card');
                     if (m.type) card.innerHTML += `<div class="match-type-label">${m.type}</div>`;
 
