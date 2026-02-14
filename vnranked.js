@@ -16,6 +16,8 @@ let filterValues = {
     minFF: null, maxFF: null
 };
 
+let ffRateMode = 'total';
+
 const seasonCache = {};
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -90,6 +92,7 @@ function updateLoadingProgress(loaded, total) {
 
 document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('loadingCanvas');
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const radius = 10;
     const size = radius * 2 + 1;
@@ -313,7 +316,6 @@ async function fetchUUIDs(season) {
     let uuidsFromGist = [];
     let uuidsRankedVN = [];
 
-    // local
     try {
         const response = await fetch(
           './uuids.json'
@@ -323,7 +325,6 @@ async function fetchUUIDs(season) {
         console.error('Error fetching UUIDs from local file:', error);
     }
 
-    // RANKED
     try {
         const leaderboardUrl = season 
             ? `https://mcsrranked.com/api/leaderboard?country=vn&season=${season}`
@@ -355,92 +356,96 @@ async function fetchUUIDs(season) {
 document.getElementById('search').addEventListener('click', fetchDataUser);
 
 const subscribeButton = document.getElementById('btsm');
-subscribeButton.disabled = false;
-subscribeButton.classList.add('off');
+if (subscribeButton) {
+    subscribeButton.disabled = false;
+    subscribeButton.classList.add('off');
+}
 
-subscribeButton.addEventListener('click', async function (event) {
-    event.preventDefault();
-    const emailInput = document.getElementById('Email');
-    const messageEl = document.getElementById('message');
+if (subscribeButton) {
+    subscribeButton.addEventListener('click', async function (event) {
+        event.preventDefault();
+        const emailInput = document.getElementById('Email');
+        const messageEl = document.getElementById('message');
 
-    const lastSent = localStorage.getItem('lastSubscribeTime');
-    if (lastSent) {
-        const now = Date.now();
-        let remaining = COOLDOWN_TIME - (now - Number(lastSent));
+        const lastSent = localStorage.getItem('lastSubscribeTime');
+        if (lastSent) {
+            const now = Date.now();
+            let remaining = COOLDOWN_TIME - (now - Number(lastSent));
 
-        if (remaining > 0) {
-            if (cooldownInterval) clearInterval(cooldownInterval);
+            if (remaining > 0) {
+                if (cooldownInterval) clearInterval(cooldownInterval);
 
-            const updateText = () => {
-                if (remaining <= 0) {
-                    clearInterval(cooldownInterval);
-                    cooldownInterval = null;
-                    messageEl.innerText = '';
-                    return;
-                }
+                const updateText = () => {
+                    if (remaining <= 0) {
+                        clearInterval(cooldownInterval);
+                        cooldownInterval = null;
+                        messageEl.innerText = '';
+                        return;
+                    }
 
-                const secondsLeft = Math.ceil(remaining / 1000);
-                const minutes = Math.floor(secondsLeft / 60);
-                const seconds = secondsLeft % 60;
+                    const secondsLeft = Math.ceil(remaining / 1000);
+                    const minutes = Math.floor(secondsLeft / 60);
+                    const seconds = secondsLeft % 60;
 
-                messageEl.innerText =
-                    `Please wait ${minutes}:${seconds.toString().padStart(2, '0')} before sending again.`;
-                messageEl.style.display = 'block';
+                    messageEl.innerText =
+                        `Please wait ${minutes}:${seconds.toString().padStart(2, '0')} before sending again.`;
+                    messageEl.style.display = 'block';
 
-                remaining -= 1000;
-            };
+                    remaining -= 1000;
+                };
 
-            updateText();
-            cooldownInterval = setInterval(updateText, 1000);
+                updateText();
+                cooldownInterval = setInterval(updateText, 1000);
+                return;
+            }
+        }
+
+        if (!emailInput.checkValidity()) {
+            emailInput.reportValidity();
             return;
         }
-    }
 
-    if (!emailInput.checkValidity()) {
-        emailInput.reportValidity();
-        return;
-    }
-
-    if (!window.currentUUID) {
-        messageEl.innerText = "No UUID to subscribe.";
-        messageEl.style.display = 'block';
-        return;
-    }
-
-    if (combinedUUIDs.has(window.currentUUID)) {
-        messageEl.innerText = "This player is already subscribed.";
-        messageEl.style.display = 'block';
-        return;
-    }
-
-
-    try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbyKP-dBiOrhKmG4HhWSRGO0Q2sICAoYZHfgOvYbCUjA0YHkML0GzqQWMMwIPk6xJ7do/exec", {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain" 
-            },
-            body: JSON.stringify({
-                uuid: window.currentUUID,
-                country: window.currentCountry || "unknown",
-                email: emailInput.value.trim()
-            })
-        }); 
-
-        if (!response.ok) {
-            throw new Error("Request failed");
+        if (!window.currentUUID) {
+            messageEl.innerText = "No UUID to subscribe.";
+            messageEl.style.display = 'block';
+            return;
         }
 
-        messageEl.innerText = "Your request has been sent!";
-        messageEl.style.display = 'block';
-        localStorage.setItem('lastSubscribeTime', Date.now());
+        if (combinedUUIDs.has(window.currentUUID)) {
+            messageEl.innerText = "This player is already subscribed.";
+            messageEl.style.display = 'block';
+            return;
+        }
 
-    } catch (error) {
-        console.error("Error subscribing:", error);
-        messageEl.innerText = "Failed to send your request. Please try again later.";
-        messageEl.style.display = 'block';
-    }
-});
+
+        try {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbyKP-dBiOrhKmG4HhWSRGO0Q2sICAoYZHfgOvYbCUjA0YHkML0GzqQWMMwIPk6xJ7do/exec", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain" 
+                },
+                body: JSON.stringify({
+                    uuid: window.currentUUID,
+                    country: window.currentCountry || "unknown",
+                    email: emailInput.value.trim()
+                })
+            }); 
+
+            if (!response.ok) {
+                throw new Error("Request failed");
+            }
+
+            messageEl.innerText = "Your request has been sent!";
+            messageEl.style.display = 'block';
+            localStorage.setItem('lastSubscribeTime', Date.now());
+
+        } catch (error) {
+            console.error("Error subscribing:", error);
+            messageEl.innerText = "Failed to send your request. Please try again later.";
+            messageEl.style.display = 'block';
+        }
+    });
+}
 
 
 async function fetchDataUser(event) {
@@ -565,12 +570,23 @@ function displayPlayerDataS(data) {
     });
 }
 
+function updateAllFFRates() {
+    playerData.forEach(p => {
+        if (ffRateMode === 'losses') {
+            p.ffRate = (p.losesRanked > 0) ? (p.forfeitsRanked / p.losesRanked) * 100 : 0;
+        } else {
+            p.ffRate = (p.playedMatchesRanked > 0) ? (p.forfeitsRanked / p.playedMatchesRanked) * 100 : 0;
+        }
+    });
+}
+
 async function fetchDataForUUIDs(season) {
     const cacheKey = season || 'current';
     
     if (seasonCache[cacheKey]) {
         console.log(`[Cache] Loading data for season: ${cacheKey}`);
         playerData = seasonCache[cacheKey];
+        updateAllFFRates();
         sortPlayerData();
         displayPlayerData();
         hideLoading();
@@ -693,10 +709,27 @@ async function fetchDataForUUIDs(season) {
 
             if (includePlayer) {
                 let nickname = data.nickname;
-                let ffRate = (playedMatchesRanked > 0) ? (forfeitsRanked / playedMatchesRanked) * 100 : 0;
                 let avgTime = (completionsRanked > 0) ? (completionTimeRanked / completionsRanked) : null;
 
-                playerData.push({ uuid, nickname, eloRate, bestTimeRanked, winsRanked, losesRanked, ffRate, avgTime });
+                let initialFF = 0;
+                if (ffRateMode === 'losses') {
+                    initialFF = (losesRanked > 0) ? (forfeitsRanked / losesRanked) * 100 : 0;
+                } else {
+                    initialFF = (playedMatchesRanked > 0) ? (forfeitsRanked / playedMatchesRanked) * 100 : 0;
+                }
+
+                playerData.push({ 
+                    uuid, 
+                    nickname, 
+                    eloRate, 
+                    bestTimeRanked, 
+                    winsRanked, 
+                    losesRanked, 
+                    forfeitsRanked,
+                    playedMatchesRanked,
+                    ffRate: initialFF, 
+                    avgTime 
+                });
             }
         });
 
@@ -729,7 +762,8 @@ function updateSeasonUI(season) {
             countDownDate = new Date(data.data.season.endsAt * 1000);
           } else if (season) {
             countDownDate = null;
-            document.getElementById("time").innerText = "Season Ended";
+            const timeEl = document.getElementById("time");
+            if (timeEl) timeEl.innerText = "Season Ended";
           }
         }
       });
@@ -781,40 +815,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const winArrow = document.getElementById("winArrow");
 
     function resetAllArrows() {
+        if (!eloArrow) return;
         [eloArrow, timeArrow, avgArrow, winArrow].forEach(arrow => {
-            arrow.classList.remove("arrow-rotated", "arrow-normal");
-            arrow.classList.add("arrow-normal");
+            if (arrow) {
+                arrow.classList.remove("arrow-rotated", "arrow-normal");
+                arrow.classList.add("arrow-normal");
+            }
         });
     }
 
     function activateArrow(arrow) {
+        if (!arrow) return;
         resetAllArrows();
         arrow.classList.remove("arrow-normal");
         arrow.classList.add("arrow-rotated");
     }
 
-    eloHeader.addEventListener('click', function () {
+    if (eloHeader) eloHeader.addEventListener('click', function () {
         sortT = 1;
         sortPlayerData();
         displayPlayerData();
         activateArrow(eloArrow);
     });
 
-    bestTimeHeader.addEventListener('click', function () {
+    if (bestTimeHeader) bestTimeHeader.addEventListener('click', function () {
         sortT = 2;
         sortPlayerData();
         displayPlayerData();
         activateArrow(timeArrow);
     });
 
-    avgTimeHeader.addEventListener('click', function () {
+    if (avgTimeHeader) avgTimeHeader.addEventListener('click', function () {
             sortT = 4;
             sortPlayerData();
             displayPlayerData();
             activateArrow(avgArrow);
         });
 
-    winrateHeader.addEventListener('click', function () {
+    if (winrateHeader) winrateHeader.addEventListener('click', function () {
         sortT = 3;
         sortPlayerData();
         displayPlayerData();
@@ -962,6 +1000,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const ffRateModeSelect = document.getElementById('ffRateMode');
+    if (ffRateModeSelect) {
+        ffRateModeSelect.addEventListener('change', (e) => {
+            ffRateMode = e.target.value;
+            updateAllFFRates();
+            displayPlayerData();
+        });
+    }
+
     fetchDataForUUIDs(activeSeason);
 });
 
@@ -1041,18 +1088,8 @@ function displayPlayerData() {
     let displayIndex = 1;
 
     playerData.forEach((userData) => {
-        const passesFilter = checkFilterPass(userData);
-        
-        let passesNumeric = true;
-        if (filterValues.minElo !== null && userData.eloRate < filterValues.minElo) passesNumeric = false;
-        if (filterValues.maxElo !== null && userData.eloRate > filterValues.maxElo) passesNumeric = false;
-
         let shouldRender = false;
         let isManualHidden = hiddenUUIDs.has(userData.uuid);
-
-        let numericPass = true;
-        if (filterValues.minElo !== null && userData.eloRate < filterValues.minElo) numericPass = false;
-        if (filterValues.maxElo !== null && userData.eloRate > filterValues.maxElo) numericPass = false;
         
         if (isFilterOpen) {
              if (checkNumericFilters(userData)) shouldRender = true;
@@ -1142,14 +1179,15 @@ function displayPlayerData() {
         let winRate = (userData.winsRanked + userData.losesRanked > 0) 
             ? (userData.winsRanked / (userData.winsRanked + userData.losesRanked)) * 100 
             : 0;
-        let ffRate = userData.ffRate.toFixed(2);
+        
+        let ffRateStr = userData.ffRate.toFixed(2);
 
         const winRateCell = row.insertCell();
         winRateCell.textContent = winRate.toFixed(2) + "%";
         winRateCell.style.textAlign = 'center';
 
         const ffRateCell = row.insertCell();
-        ffRateCell.textContent = `${ffRate}%`;
+        ffRateCell.textContent = `${ffRateStr}%`;
         ffRateCell.style.textAlign = 'center';
 
         if (userData.eloRate >= 2000) eloCell.style.color = 'purple';
@@ -1213,6 +1251,7 @@ function convertToCSV() {
     let csv = '';
     csv += `Season: ${seasonValue}\n`;
     csv += `Exported at: ${timestamp}\n`;
+    csv += `FF Mode: ${ffRateMode === 'losses' ? 'FF/Loss' : 'FF/Total'}\n`;
     csv += `\n`; 
 
     csv += '#,Nickname,Elo Rate,Best Time,Avg Time,Win Rate,FF Rate\n';
@@ -1251,10 +1290,10 @@ function downloadCSV() {
       document.body.removeChild(a);
     } catch (error) {
       console.error('Có lỗi khi tải xuống file CSV:', error);
-      alert('Tải xuống thất bại. Kiểm tra console để biết chi tiết.');
     }
 }
-document.getElementById('downloadButton').addEventListener('click', downloadCSV);
+const downloadBtn = document.getElementById('downloadButton');
+if (downloadBtn) downloadBtn.addEventListener('click', downloadCSV);
 
 let countDownDate;
 
@@ -1320,6 +1359,7 @@ window.addEventListener('popstate', () => {
 function syncPixelSelectFromNative() {
   const root = document.getElementById("seasonSelectUI");
   const native = document.getElementById("seasonSelect");
+  if (!root || !native) return;
   const btn = root.querySelector(".pixel-select__btn");
   const valueEl = root.querySelector(".pixel-select__value");
   const list = root.querySelector(".pixel-select__list");
@@ -1402,28 +1442,31 @@ let x = setInterval(function() {
     const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
     const formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
     
-    document.getElementById("time").innerText = "End in " + days + " days " + formattedHours + ":"
-    + formattedMinutes + ":" + formattedSeconds;
-   
-    if (distance < 0) {
-        clearInterval(x);
-        document.getElementById("time").innerText = "Season Ended";
+    const timeDisplay = document.getElementById("time");
+    if (timeDisplay) {
+        timeDisplay.innerText = "End in " + days + " days " + formattedHours + ":"
+        + formattedMinutes + ":" + formattedSeconds;
+    
+        if (distance < 0) {
+            clearInterval(x);
+            timeDisplay.innerText = "Season Ended";
+        }
     }
 }, 1000);
 
 var modal = document.getElementById('myModal');
 var modal2 = document.getElementById('myModal-content');
-var btn = document.getElementById("Sub");
-var span = document.getElementsByClassName("close")[0]; 
+var btnSub = document.getElementById("Sub");
+var spanModal = document.getElementsByClassName("close")[0]; 
 
-if(btn) {
-    btn.onclick = function() {
+if(btnSub) {
+    btnSub.onclick = function() {
         modal.style.display = "flex";
     }
 }
 
-if(span) {
-    span.onclick = function() {
+if(spanModal) {
+    spanModal.onclick = function() {
         modal.classList.add('modal-exit2');
         modal2.classList.add('modal-exit');
         setTimeout(function() {
@@ -1583,13 +1626,15 @@ function isAnyFilterActive() {
 const moreBtn = document.getElementById("moreBtn");
 const moreMenu = document.getElementById("moreMenu");
 
-moreBtn.addEventListener("click", () => {
-    moreMenu.style.display =
-        moreMenu.style.display === "block" ? "none" : "block";
-});
+if (moreBtn && moreMenu) {
+    moreBtn.addEventListener("click", () => {
+        moreMenu.style.display =
+            moreMenu.style.display === "block" ? "none" : "block";
+    });
 
-document.addEventListener("click", (e) => {
-    if (!e.target.closest(".more-container")) {
-        moreMenu.style.display = "none";
-    }
-});
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".more-container")) {
+            moreMenu.style.display = "none";
+        }
+    });
+}
