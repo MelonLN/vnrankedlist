@@ -45,7 +45,6 @@
                 </div>
             </div>
             <div class="button-container">
-                <button onclick="window.open('https://youtu.be/DlafRKX0ZbI', '_blank')" id="trailerBtn">Trailer</button>
                 <button onclick="window.location.href='speedrun.html'" id="srccomBtn">Src.com</button>
                 <button onclick="window.location.href='index.html'" id="championshipBtn">Ranked</button>
             </div>
@@ -54,17 +53,16 @@
         <div class="info-row-custom">
             <div class="live-section">
                 <span class="live-at-text">Live at:</span>
-                <a href="https://www.youtube.com/@canhvjp/live" target="_blank" class="live-btn-header">
+                <a href="https://www.youtube.com/@taodai1337-s1n/live" target="_blank" class="live-btn-header">
                     <div class="yt-top-row">
                         <svg id="timeArrow"width="20" height="20">
                             <use href="#sort-arrow"></use>
                         </svg>
                         <div>
                             <span class="yt-text">YouTube</span>
-                            <div class="yt-handle">@canhvjp</div>
+                            <div class="yt-handle">@taodai1337</div>
                         </div>
                     </div>
-                    
                 </a>
             </div>
             <p class="discord-info">
@@ -75,6 +73,26 @@
         <div class="champ-container-main">
             <div id="bracket-root" class="bracket-scroll-container">
                 <div class="loading-text">Đang tải bảng đấu...</div>
+            </div>
+        </div>
+
+        <div id="leaderboardModal" class="modal">
+            <div class="modal-content leaderboard-modal-content">
+                <span class="close" id="closeLeaderboard">&times;</span>
+                <h2 class="modal-title">VÒNG SƠ LOẠI</h2>
+                <div class="leaderboard-table-container">
+                    <table class="full-leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="text-align: left; padding-left: 20px;">Player</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

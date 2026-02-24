@@ -17,9 +17,22 @@ const db = getDatabase(app);
 document.addEventListener('DOMContentLoaded', function () {
     const bracketRoot = document.getElementById('bracket-root');
     const seasonSelectUI = document.getElementById('seasonSelectUI');
+    const leaderboardModal = document.getElementById('leaderboardModal');
+    const closeLeaderboard = document.getElementById('closeLeaderboard');
+    const leaderboardBody = document.getElementById('leaderboardBody');
 
     let allSeasonsData = [];
     let currentSeasonId = null;
+    let currentSeasonObject = null;
+
+    closeLeaderboard.onclick = () => {
+        leaderboardModal.style.display = 'none';
+    };
+    window.onclick = (event) => {
+        if (event.target == leaderboardModal) {
+            leaderboardModal.style.display = 'none';
+        }
+    };
 
     function getSeasonFromUrl() {
         const params = new URLSearchParams(window.location.search);
@@ -52,9 +65,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             currentSeasonId = seasonToRender.id;
+            currentSeasonObject = seasonToRender;
             
             initSeasonPicker(currentSeasonId);
             renderSeason(seasonToRender);
+
+            if (leaderboardModal.style.display === 'flex') {
+                updateModalContent(seasonToRender);
+            }
             
             console.log("Dữ liệu đã cập nhật Live từ Firebase!");
         }, (error) => {
@@ -114,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 li.classList.add('is-selected');
                 updateUrl(s.id);
                 currentSeasonId = s.id;
+                currentSeasonObject = s;
                 renderSeason(s);
                 close();
             };
@@ -124,16 +143,54 @@ document.addEventListener('DOMContentLoaded', function () {
         valEl.textContent = currentActive ? (currentActive.name || currentActive.id) : activeSeasonId;
     }
 
-    function getPlayerData(participants, seed) {
+    function getPlayerData(participants, seed, hideZero = false) {
         const s = String(seed);
         if (!participants || !participants[s]) {
-            return { name: "    ", points: 0, seed: seed };
+            return { name: "", points: "", seed: seed };
         }
+        
+        const p = participants[s];
+        if (hideZero && (p.points === 0 || !p.points)) {
+            return { name: "", points: "", seed: seed };
+        }
+
         return { 
-            name: participants[s].name, 
-            points: participants[s].points || 0,
+            name: p.name || "", 
+            points: p.points !== undefined ? p.points : 0,
             seed: seed 
         };
+    }
+
+    function updateModalContent(season) {
+        leaderboardBody.innerHTML = '';
+        const participants = season.participants;
+        
+        const playerList = [];
+        for (let seed in participants) {
+            if (seed === "null" || seed === "0" || parseInt(seed) <= 4) continue;
+            playerList.push({
+                seed: seed,
+                name: participants[seed].name,
+                points: participants[seed].points || 0
+            });
+        }
+
+        playerList.sort((a, b) => b.points - a.points);
+
+        playerList.forEach((p, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td style="text-align: left; color: #fff; padding-left: 20px;">${p.name}</td>
+                <td style="font-weight: bold; color: #87ce34;">${p.points}</td>
+            `;
+            leaderboardBody.appendChild(tr);
+        });
+    }
+
+    function openFullLeaderboard(season) {
+        updateModalContent(season);
+        leaderboardModal.style.display = 'flex';
     }
 
     function renderSeason(season) {
@@ -158,14 +215,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (round.type === 'list') {
                 const listDiv = document.createElement('div');
-                listDiv.className = 'qualifier-list';
+                listDiv.className = 'qualifier-list clickable-qualifier';
+                
+                listDiv.onclick = () => openFullLeaderboard(season);
+
                 const header = document.createElement('div');
                 header.className = 'qualifier-header';
                 header.innerHTML = `<div>#</div><div>Seed</div><div style="text-align:left; padding-left:15px">Player</div><div>Pts</div>`;
                 listDiv.appendChild(header);
 
                 round.seeds.forEach((seed, i) => {
-                    const p = getPlayerData(participants, seed);
+                    const p = getPlayerData(participants, seed, true);
                     const item = document.createElement('div');
                     item.className = 'qualifier-item';
                     item.setAttribute('data-player-seed', seed);
@@ -179,13 +239,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     listDiv.appendChild(item);
                 });
 
+                // Nếu có link watch cho vòng loại, hiển thị bên dưới danh sách
                 if (round.link) {
                     const watchBtn = document.createElement('div');
                     watchBtn.className = 'watch-btn-tab';
                     watchBtn.innerHTML = '<span>▶ watch</span>';
-                    watchBtn.onclick = () => window.open(round.link, '_blank');
+                    watchBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        window.open(round.link, '_blank');
+                    };
                     listDiv.appendChild(watchBtn);
                 }
+
                 matchesWrapper.appendChild(listDiv);
             } 
             else {
