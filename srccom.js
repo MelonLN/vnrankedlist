@@ -109,10 +109,30 @@ async function fetchSpeedrunData() {
     const PENDING_URL = "https://www.speedrun.com/api/v1/runs?category=mkeyl926&status=new&max=200&embed=players";
 
     try {
-        const [lbRes, pendingRes] = await Promise.all([
-            fetch(LB_URL).then(r => r.json()),
-            fetch(PENDING_URL).then(r => r.json())
-        ]);
+        const lbPromise = fetch(LB_URL).then(r => r.json());
+        
+        let pendingData = [];
+        let nextUrl = PENDING_URL;
+        
+        while (nextUrl) {
+            const pRes = await fetch(nextUrl).then(r => r.json());
+            if (pRes.data) {
+                pendingData = pendingData.concat(pRes.data);
+            }
+            const nextLink = pRes.pagination && pRes.pagination.links ? pRes.pagination.links.find(l => l.rel === 'next') : null;
+            if (nextLink) {
+                let nUrl = nextLink.uri;
+                if (!nUrl.includes('embed=')) {
+                    nUrl += (nUrl.includes('?') ? '&' : '?') + 'embed=players';
+                }
+                nextUrl = nUrl;
+            } else {
+                nextUrl = null;
+            }
+        }
+
+        const lbRes = await lbPromise;
+        const pendingRes = { data: pendingData };
 
         const playerMap = {};
         
@@ -150,6 +170,7 @@ async function fetchSpeedrunData() {
         }).map(run => {
             const pInfo = playerMap[run.run.players[0].id];
             return {
+                id: run.run.id,
                 name: pInfo.name,
                 igt: run.run.times.ingame_t,
                 rta: run.run.times.realtime_t,
@@ -178,6 +199,7 @@ async function fetchSpeedrunData() {
             const pId = run.players.data[0].id;
             const pInfo = playerMap[pId];
             return {
+                id: run.id,
                 name: pInfo.name,
                 igt: run.times.ingame_t,
                 rta: run.times.realtime_t,
@@ -188,7 +210,19 @@ async function fetchSpeedrunData() {
             };
         });
 
-        allVnRuns = [...verifiedRuns, ...pendingRuns];
+        const rawAllRuns = [...verifiedRuns, ...pendingRuns];
+        allVnRuns = [];
+        const seenKeys = new Set();
+        const seenIds = new Set();
+
+        rawAllRuns.forEach(run => {
+            const dedupeKey = `${run.name}_${run.sortTime}`;
+            if (!seenKeys.has(dedupeKey) && !seenIds.has(run.id)) {
+                seenKeys.add(dedupeKey);
+                if (run.id) seenIds.add(run.id);
+                allVnRuns.push(run);
+            }
+        });
 
         allVnRuns.sort((a, b) => {
             const timeA = a.sortTime || 999999;
