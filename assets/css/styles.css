@@ -198,7 +198,7 @@ body{
   font-family: mcfont;
   ascent-override: 85%;
   descent-override: 15%;
-  src: url(./font/Pixer-Regular.woff2);
+  src: url(../font/Pixer-Regular.woff2);
 }
   
 
@@ -360,14 +360,14 @@ h1 {
   font-family: Mcbl;
   ascent-override: 85%;
   descent-override: 15%;
-  src: url(./font/MinecraftTen-VGORe.ttf);
+  src: url(../font/MinecraftTen-VGORe.ttf);
 }
 
 @font-face {
   font-family: ranked;
   ascent-override: 85%;
   descent-override: 15%;
-  src: url(./font/Pixelcraft.otf);
+  src: url(../font/Pixelcraft.otf);
 }
 
 /* Popup container */

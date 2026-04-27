@@ -318,7 +318,7 @@ async function fetchUUIDs(season) {
 
     try {
         const response = await fetch(
-          './uuids.json'
+          'assets/data/uuids.json'
         );
         uuidsFromGist = await response.json();
     } catch (error) {
